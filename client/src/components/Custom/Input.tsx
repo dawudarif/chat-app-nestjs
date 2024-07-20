@@ -4,10 +4,11 @@ import { Eye, EyeOff } from "lucide-react";
 
 interface InputProps {
   value: string | number;
-  type: "text" | "number" | "password";
+  type: "text" | "number" | "password" | "email";
   placeholder?: string;
   otherClasses?: string;
   iconSize?: string;
+  name: string;
   handleChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
@@ -16,8 +17,9 @@ const Input: React.FC<InputProps> = ({
   type = "",
   value,
   handleChange,
-  iconSize = 30,
+  iconSize = "1rem",
   placeholder = "Enter Text",
+  name,
 }) => {
   const [showPassword, setShowPassword] = useState(false);
   const color = "#222";
@@ -27,7 +29,7 @@ const Input: React.FC<InputProps> = ({
   };
 
   const classes = clsx(
-    "rounded-lg p-2 text-base focus:outline-none border-2 border-gray-500 placeholder:text-gray-600 text-gray-700 w-fit",
+    "rounded-lg p-2 text-base focus:outline-none border-2 border-gray-500 text-gray-700 w-fit",
     otherClasses
   );
 
@@ -41,10 +43,11 @@ const Input: React.FC<InputProps> = ({
       >
         <input
           type={showPassword ? "text" : "password"}
+          name={name}
           value={value}
           onChange={handleChange}
           placeholder={placeholder}
-          className="focus:outline-none"
+          className="focus:outline-none w-[95%]"
         />
         {showPassword ? (
           <EyeOff size={iconSize} color={color} onClick={handleShowPassword} />
@@ -58,6 +61,7 @@ const Input: React.FC<InputProps> = ({
       <input
         type={type}
         value={value}
+        name={name}
         placeholder={placeholder}
         onChange={handleChange}
         className={classes}
