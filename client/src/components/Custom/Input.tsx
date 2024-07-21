@@ -17,19 +17,19 @@ const Input: React.FC<InputProps> = ({
   type = "",
   value,
   handleChange,
-  iconSize = "1rem",
+  iconSize = "1.5rem",
   placeholder = "Enter Text",
   name,
 }) => {
   const [showPassword, setShowPassword] = useState(false);
-  const color = "#222";
+  const color = "#272727";
 
   const handleShowPassword = () => {
     setShowPassword(!showPassword);
   };
 
   const classes = clsx(
-    "rounded-lg p-3 text-base focus:outline-none border-2 border-gray-500 text-gray-700 w-fit",
+    "rounded-lg p-3 text-base font-semibold focus:outline-none border-2 border-gray-500 text-gray-700 w-fit",
     otherClasses
   );
 
