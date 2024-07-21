@@ -1,15 +1,11 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import Login from "../../components/Auth/Login";
 import Register from "../../components/Auth/Register";
 
 export default function Auth() {
   const navigate = useNavigate();
-  const [pageType, setPageType] = useState<"login" | "register">("login");
-
-  const handlePageChange = () => {
-    setPageType(pageType === "login" ? "register" : "login");
-  };
+  const [searchParams] = useSearchParams();
+  const page = searchParams.get("page");
 
   const state = false;
 
@@ -17,9 +13,9 @@ export default function Auth() {
     navigate("/");
   }
 
-  if (pageType === "login") {
-    return <Login setPageType={handlePageChange} />;
+  if (page === "register") {
+    return <Register />;
   }
 
-  return <Register setPageType={handlePageChange} />;
+  return <Login />;
 }
