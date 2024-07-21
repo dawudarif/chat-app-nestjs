@@ -29,7 +29,7 @@ const Input: React.FC<InputProps> = ({
   };
 
   const classes = clsx(
-    "rounded-lg p-2 text-base focus:outline-none border-2 border-gray-500 text-gray-700 w-fit",
+    "rounded-lg p-3 text-base focus:outline-none border-2 border-gray-500 text-gray-700 w-fit",
     otherClasses
   );
 
@@ -49,11 +49,17 @@ const Input: React.FC<InputProps> = ({
           placeholder={placeholder}
           className="focus:outline-none w-[95%]"
         />
-        {showPassword ? (
-          <EyeOff size={iconSize} color={color} onClick={handleShowPassword} />
-        ) : (
-          <Eye size={iconSize} color={color} onClick={handleShowPassword} />
-        )}
+        <span className="w-[5%]">
+          {showPassword ? (
+            <EyeOff
+              size={iconSize}
+              color={color}
+              onClick={handleShowPassword}
+            />
+          ) : (
+            <Eye size={iconSize} color={color} onClick={handleShowPassword} />
+          )}
+        </span>
       </div>
     );
   } else {

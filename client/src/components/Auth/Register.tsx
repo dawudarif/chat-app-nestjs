@@ -1,11 +1,9 @@
 import React, { useState } from "react";
 import Input from "../Custom/Input";
+import { Link } from "react-router-dom";
+import Button from "../Custom/Button";
 
-interface RegisterProps {
-  setPageType: () => void;
-}
-
-const Register: React.FC<RegisterProps> = ({ setPageType }) => {
+const Register = () => {
   const [data, setData] = useState({
     email: "",
     username: "",
@@ -16,11 +14,16 @@ const Register: React.FC<RegisterProps> = ({ setPageType }) => {
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setData({ ...data, [e.target.name]: e.target.value });
   };
+
+  const handleRegister = (e: React.FormEvent) => {
+    e.preventDefault();
+  };
+
   return (
     <div className="flex justify-center items-center w-full">
       <div className="flex justify-center items-center flex-col max-w-[50%] w-full rounded-xl shadow-lg my-16 lg:px-10 px-5 py-10">
         <h1 className="text-h1 text-gray-900 font-semibold">Register</h1>
-        <div className="w-full">
+        <form onSubmit={handleRegister} className="w-full">
           <label htmlFor="email">
             <h4 className="text-h4 text-gray-600 mb-3">Email</h4>
             <Input
@@ -65,19 +68,18 @@ const Register: React.FC<RegisterProps> = ({ setPageType }) => {
               otherClasses="w-full mb-3"
             />
           </label>
-          <button
-            className="w-full rounded-xl bg-blue-500 text-white font-semibold py-3 hover:bg-blue-600 mt-4"
+          <Button
+            loading={false}
+            otherClasses="w-full mb-4"
+            variant="blue-filled"
             type="submit"
           >
             Register
-          </button>
-          <p
-            onClick={setPageType}
-            className="mt-4 text-gray-600 cursor-pointer"
-          >
+          </Button>
+          <Link to="/auth" className="text-gray-600 cursor-pointer">
             Already a user? Login here
-          </p>
-        </div>
+          </Link>
+        </form>
       </div>
     </div>
   );
