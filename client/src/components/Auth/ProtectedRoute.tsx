@@ -1,11 +1,17 @@
+import { useContext } from "react";
 import Auth from "../../Pages/Auth/Auth";
-import Index from "../../Pages/Index/Index";
+import { UserContext } from "../../context/userContext";
 
-export default function ProtectedRoute() {
-  const index = true;
-  if (index) {
-    return <Auth />;
+export default function ProtectedRoute({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  const { userInfo } = useContext(UserContext) as any;
+
+  if (userInfo?.email) {
+    return <>{children}</>;
   } else {
-    return <Index />;
+    return <Auth />;
   }
 }

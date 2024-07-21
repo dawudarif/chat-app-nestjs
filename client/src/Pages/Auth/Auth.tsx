@@ -1,15 +1,17 @@
 import { useNavigate, useSearchParams } from "react-router-dom";
 import Login from "../../components/Auth/Login";
 import Register from "../../components/Auth/Register";
+import { useContext } from "react";
+import { UserContext } from "../../context/userContext";
 
 export default function Auth() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const page = searchParams.get("page");
 
-  const state = false;
+  const { userInfo } = useContext(UserContext) as any;
 
-  if (state) {
+  if (userInfo?.email) {
     navigate("/");
   }
 

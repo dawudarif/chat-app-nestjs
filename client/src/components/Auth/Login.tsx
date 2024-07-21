@@ -6,7 +6,7 @@ import api from "../../utils/api";
 
 const Login = () => {
   const navigate = useNavigate();
-  const [error, setError] = useState("null");
+  const [error, setError] = useState<null | string>(null);
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState({
     email: "",
