@@ -3,6 +3,28 @@ export default {
   content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],
   theme: {
     extend: {
+      colors: {
+        "brand-white": "#fff",
+        "brand-black": "#272727",
+        "brand-navy": "#1d375c",
+        "brand-green": "#1fbf9b",
+        "brand-yellow": "#f9b947",
+        "brand-orange": "#D87842",
+        "brand-blue": "#22408F",
+        "grey-light": "#e7ebef",
+        "grey-light-secondary": "#bdc4d2",
+        "silver-light": "#f2f5f8",
+        "silver-light-secondary": "#CFD6DD",
+        "silver-dark": "#ACB8C4",
+        "brand-filled-blue": "#0082C8",
+        grey: "#4e5656",
+        "grey-secondary": "#F0F3F8",
+        "brand-green-dark": "#5FB752",
+        "brand-red": "#F05133",
+        "brand-red-dark": "#EB2700",
+        "brand-navy-secondary": "#1D375C",
+        "brand-dark-gray": "#58585b",
+      },
       screens: {
         xs: "360px",
         xsm: "500px",
