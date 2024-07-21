@@ -1,9 +1,13 @@
 import React, { useState } from "react";
 import Input from "../Custom/Input";
 import Button from "../Custom/Button";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import api from "../../utils/api";
 
 const Login = () => {
+  const navigate = useNavigate();
+  const [error, setError] = useState("null");
+  const [loading, setLoading] = useState(false);
   const [data, setData] = useState({
     email: "",
     password: "",
@@ -13,8 +17,26 @@ const Login = () => {
     setData({ ...data, [e.target.name]: e.target.value });
   };
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
+    setLoading(true);
+    try {
+      const response = await api.post("/auth/signin", data);
+
+      if (response.status === 201) {
+        navigate("/");
+      } else if (response.status === 401 || response.status === 400) {
+        throw new Error();
+      }
+    } catch (error: any) {
+      if (error.isAxiosError) {
+        setError("Invalid Credentaials");
+      } else {
+        setError("Invalid Credentaials");
+      }
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -44,8 +66,11 @@ const Login = () => {
               otherClasses="w-full mb-3"
             />
           </label>
+          <p className="text-brand-red font-semibold text-h4 leading-[100%] my-2">
+            {error !== null && error}
+          </p>
           <Button
-            loading={false}
+            loading={loading}
             otherClasses="w-full mb-4"
             variant="blue-filled"
             type="submit"
