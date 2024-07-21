@@ -5,6 +5,7 @@ import "./index.css";
 import { UserContext } from "./context/userContext";
 import { useContext, useEffect } from "react";
 import api from "./utils/api";
+import Auth from "./Pages/Auth/Auth";
 
 function App() {
   const { setUserInfo } = useContext(UserContext) as any;
@@ -20,8 +21,22 @@ function App() {
 
   return (
     <Routes>
-      <Route path="/" element={<Index />} />
-      <Route path="/auth" element={<ProtectedRoute />} />
+      <Route
+        path="/"
+        element={
+          <ProtectedRoute>
+            <Index />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/auth"
+        element={
+          <ProtectedRoute>
+            <Auth />
+          </ProtectedRoute>
+        }
+      />
     </Routes>
   );
 }
