@@ -1,11 +1,12 @@
 import React, { useState } from "react";
 import Input from "../Custom/Input";
 import Button from "../Custom/Button";
-import { Link, useNavigate } from "react-router-dom";
 import api from "../../utils/api";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 const Login = () => {
-  const navigate = useNavigate();
+  const router = useRouter();
   const [error, setError] = useState<null | string>(null);
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState({
@@ -24,7 +25,7 @@ const Login = () => {
       const response = await api.post("/auth/signin", data);
 
       if (response.status === 201) {
-        navigate("/");
+        router.push("/");
       } else if (response.status === 401 || response.status === 400) {
         throw new Error();
       }
@@ -78,7 +79,7 @@ const Login = () => {
             Login
           </Button>
           <Link
-            to="/auth?page=register"
+            href="/auth?page=register"
             className="text-gray-600 cursor-pointer"
           >
             New here? Click to Register

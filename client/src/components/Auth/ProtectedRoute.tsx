@@ -1,17 +1,18 @@
-import { useContext } from "react";
-import Auth from "../../Pages/Auth/Auth";
-import { UserContext } from "../../context/userContext";
+"use client";
+import { useRouter } from "next/navigation";
+import { useUserContext } from "../../context/UserContext";
 
 export default function ProtectedRoute({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const { userInfo } = useContext(UserContext) as any;
+  const router = useRouter();
+  const { userInfo } = useUserContext();
 
   if (userInfo?.email) {
     return <>{children}</>;
   } else {
-    return <Auth />;
+    router.push("/auth");
   }
 }

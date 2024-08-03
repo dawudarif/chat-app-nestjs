@@ -1,9 +1,14 @@
 import React, { useState } from "react";
 import Input from "../Custom/Input";
-import { Link } from "react-router-dom";
 import Button from "../Custom/Button";
+import api from "../../utils/api";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 const Register = () => {
+  const router = useRouter();
+  const [error, setError] = useState<null | string>(null);
+  const [loading, setLoading] = useState(false);
   const [data, setData] = useState({
     email: "",
     username: "",
@@ -15,8 +20,28 @@ const Register = () => {
     setData({ ...data, [e.target.name]: e.target.value });
   };
 
-  const handleRegister = (e: React.FormEvent) => {
+  const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
+    setLoading(true);
+    try {
+      const response = await api.post("/auth/signup", data);
+
+      // if (response.status === 201) {
+      //   navigate("/");
+      // } else if (response.status === 401 || response.status === 400) {
+      //   throw new Error();
+      // }
+    } catch (error: any) {
+      if (error.isAxiosError) {
+        console.log(error);
+
+        // setError("Invalid Credentaials");
+      } else {
+        setError("Invalid Credentaials");
+      }
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -69,14 +94,14 @@ const Register = () => {
             />
           </label>
           <Button
-            loading={false}
+            loading={loading}
             otherClasses="w-full mb-4"
             variant="blue-filled"
             type="submit"
           >
             Register
           </Button>
-          <Link to="/auth" className="text-gray-600 cursor-pointer">
+          <Link href="/auth" className="text-gray-600 cursor-pointer">
             Already a user? Login here
           </Link>
         </form>
