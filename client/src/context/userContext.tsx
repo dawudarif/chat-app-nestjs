@@ -1,6 +1,12 @@
-import { createContext, useState } from "react";
+"use client";
+import { createContext, useContext, useState } from "react";
 
-export const UserContext = createContext({});
+interface UserContextType {
+  userInfo: any;
+  setUserInfo: (userInfo: any) => void;
+}
+
+const UserContext = createContext<UserContextType | undefined>(undefined);
 
 export const UserContextProvider = ({
   children,
@@ -14,4 +20,13 @@ export const UserContextProvider = ({
       {children}
     </UserContext.Provider>
   );
+};
+
+export const useUserContext = () => {
+  const context = useContext(UserContext);
+
+  if (context === undefined) {
+    throw new Error("useUserContext must be used within a UserContextProvider");
+  }
+  return context;
 };
