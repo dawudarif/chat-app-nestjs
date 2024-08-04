@@ -5,8 +5,7 @@ import { Eye, EyeOff, Search } from "lucide-react";
 interface InputProps {
   value: string | number;
   type: "text" | "number" | "password" | "email";
-  inputType: "text" | "number" | "password" | "email" | "search";
-
+  inputType?: "text" | "number" | "password" | "email" | "search";
   placeholder?: string;
   otherClasses?: string;
   iconSize?: string;
@@ -37,7 +36,7 @@ const Input: React.FC<InputProps> = ({
   );
 
   switch (inputType) {
-    case "text":
+    case "password":
       return (
         <div
           className={clsx(
