@@ -2,6 +2,7 @@
 import ProtectedRoute from "../components/Auth/ProtectedRoute";
 import AppIcon from "../components/AppIcon";
 import { Suspense, useEffect, useState } from "react";
+import ListView from "../components/chat/ListView";
 
 export default function Home() {
   const [loadingScreen, setLoaingScreen] = useState(true);
@@ -22,5 +23,9 @@ export default function Home() {
     );
   }
 
-  return <ProtectedRoute>hello</ProtectedRoute>;
+  return (
+    <ProtectedRoute>
+      <ListView />
+    </ProtectedRoute>
+  );
 }
