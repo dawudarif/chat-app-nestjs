@@ -16,7 +16,7 @@ export default function ListView() {
         inputType="search"
         name="input"
         placeholder="Search"
-        otherClasses="w-full"
+        otherClasses="w-full border-l-0 border-t-0 border-r-0 rounded-none"
         type="text"
       />
       {Array(8)
