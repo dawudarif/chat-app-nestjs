@@ -3,6 +3,7 @@ import ProtectedRoute from "../components/Auth/ProtectedRoute";
 import AppIcon from "../components/AppIcon";
 import { Suspense, useEffect, useState } from "react";
 import ListView from "../components/chat/ListView";
+import ChatView from "../components/chat/ChatView";
 
 export default function Home() {
   const [loadingScreen, setLoaingScreen] = useState(true);
@@ -25,7 +26,10 @@ export default function Home() {
 
   return (
     <ProtectedRoute>
-      <ListView />
+      <div className="flex">
+        <ListView />
+        <ChatView />
+      </div>
     </ProtectedRoute>
   );
 }
