@@ -16,7 +16,7 @@ interface InputProps {
 const Input: React.FC<InputProps> = ({
   otherClasses,
   type = "",
-  inputType = "search",
+  inputType = "text",
   value,
   handleChange,
   iconSize = "1.5rem",
