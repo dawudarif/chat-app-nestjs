@@ -25,7 +25,7 @@ export default function ChatView() {
           <Info size={30} />
         </div>
       </div>
-      <div className="w-full h-[34.5rem] overflow-scroll"></div>
+      <div className="w-full h-[34.5rem] overflow-y-scroll"></div>
 
       <div className="w-full flex justify-start items-center gap-2 mx-1 py-2">
         <Input
