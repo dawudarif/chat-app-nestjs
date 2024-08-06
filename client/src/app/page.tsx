@@ -26,7 +26,7 @@ export default function Home() {
 
   return (
     <ProtectedRoute>
-      <div className="flex">
+      <div className="flex max-w-full overflow-hidden">
         <ListView />
         <ChatView />
       </div>
