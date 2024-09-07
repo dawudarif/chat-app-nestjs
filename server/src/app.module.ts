@@ -7,8 +7,7 @@ import { UserService } from './user/user.service';
 import { AuthModule } from './auth/auth.module';
 import { UserModule } from './user/user.module';
 import { ConfigModule } from '@nestjs/config';
-import { MessageModule } from './message/message.module';
-import { ConversationModule } from './conversation/conversation.module';
+import { ChatGateway } from './chat/chat.gateway';
 
 @Module({
   imports: [
@@ -18,10 +17,8 @@ import { ConversationModule } from './conversation/conversation.module';
     ConfigModule.forRoot({
       isGlobal: true,
     }),
-    MessageModule,
-    ConversationModule,
   ],
   controllers: [AppController],
-  providers: [AppService, PrismaService, UserService],
+  providers: [AppService, PrismaService, UserService, ChatGateway],
 })
 export class AppModule {}
