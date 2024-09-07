@@ -4,7 +4,9 @@ import { ValidationPipe } from '@nestjs/common';
 import cookieParser from 'cookie-parser';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create(AppModule, {
+    logger: ['log', 'error', 'warn', 'debug'], // Enable debug level logging
+  });
 
   app.useGlobalPipes(new ValidationPipe());
   app.use(cookieParser());
