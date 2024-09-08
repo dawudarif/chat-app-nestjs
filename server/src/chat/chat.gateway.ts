@@ -1,4 +1,4 @@
-import { OnModuleInit, UseGuards } from '@nestjs/common';
+import { OnModuleInit, Req, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import {
   MessageBody,
@@ -10,6 +10,7 @@ import {
 import { Observable, of } from 'rxjs';
 import { Server } from 'socket.io';
 import { CookieGuard } from '../auth/cookie.guard';
+import { Request } from 'express';
 
 @WebSocketGateway({
   cors: { origin: '*', withCredentials: true },
@@ -27,8 +28,12 @@ export class ChatGateway implements OnModuleInit {
 
   @UseGuards(CookieGuard)
   @SubscribeMessage('message')
-  handleMessage(@MessageBody() data: any): Observable<WsResponse<any>> {
-    console.log('message', data);
+  handleMessage(
+    @MessageBody() data: any,
+    @Req() req: Request,
+  ): Observable<WsResponse<any>> {
+    console.log('message', req.user);
+
     return of({
       event: 'message',
       data: { 'MESSAGE RETURNED FROM SERVER': data },
