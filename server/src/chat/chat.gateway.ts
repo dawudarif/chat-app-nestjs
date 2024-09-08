@@ -11,11 +11,15 @@ import { Observable, of } from 'rxjs';
 import { Server } from 'socket.io';
 import { CookieGuard } from '../auth/cookie.guard';
 import { Request } from 'express';
+import { ChatService } from './chat.service';
+import { MessageDTO } from './dto/message.dto';
 
 @WebSocketGateway({
   cors: { origin: '*', withCredentials: true },
 })
 export class ChatGateway implements OnModuleInit {
+  constructor(private chatService: ChatService) {}
+
   @WebSocketServer()
   server: Server;
 
@@ -28,22 +32,12 @@ export class ChatGateway implements OnModuleInit {
 
   @UseGuards(CookieGuard)
   @SubscribeMessage('message')
-  handleMessage(
-    @MessageBody() data: any,
-    @Req() req: Request,
-  ): Observable<WsResponse<any>> {
-    console.log('message', req.user);
-
-    return of({
-      event: 'message',
-      data: { 'MESSAGE RETURNED FROM SERVER': data },
+  async handleMessage(@MessageBody() data: MessageDTO, @Req() req: Request) {
+    const messageHandler = await this.chatService.handleMessage(req, {
+      conversationId: data.conversationId,
+      messageBody: data.messageBody,
     });
-  }
 
-  @UseGuards(CookieGuard)
-  @SubscribeMessage('event')
-  handleEvent(@MessageBody() data: any): Observable<WsResponse<any>> {
-    console.log('event', data);
-    return of({ event: 'event', data: 'EVENT RETURNED FROM SERVER' });
+    return messageHandler;
   }
 }

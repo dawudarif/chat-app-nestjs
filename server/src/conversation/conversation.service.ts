@@ -43,19 +43,9 @@ export class ConversationService {
       where: {
         id: data.conversationId,
       },
-      include: {
-        participants: {
-          where: {
-            userId: {
-              in: [data.senderId, data.receiverId],
-            },
-          },
-        },
-      },
     });
 
-    if (checkConversation && checkConversation.participants.length === 2) {
-      console.log('Valid conversation', checkConversation);
+    if (checkConversation) {
       return checkConversation;
     } else {
       throw new NotFoundException('Invalid conversation');

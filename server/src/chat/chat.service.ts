@@ -18,17 +18,11 @@ export class ChatService {
   ) {}
 
   async handleMessage(req: any, data: MessageDTO) {
-    const checkUser = data.sender === req.user?.sub;
     const senderId = req.user?.sub;
-
-    if (!checkUser) {
-      throw new UnauthorizedException('Invalid User');
-    }
 
     await this.prisma.$transaction(async (prisma) => {
       await this.conversationService.validateConversation({
         conversationId: data.conversationId,
-        receiverId: data.receiver,
         senderId,
       });
 
