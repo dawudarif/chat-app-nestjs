@@ -7,9 +7,5 @@ export class ValidateConversation {
 
   @IsNotEmpty()
   @IsString()
-  receiverId: string;
-
-  @IsNotEmpty()
-  @IsString()
   conversationId: string;
 }
