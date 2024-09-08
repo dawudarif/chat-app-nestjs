@@ -8,6 +8,10 @@ import { AuthModule } from './auth/auth.module';
 import { UserModule } from './user/user.module';
 import { ConfigModule } from '@nestjs/config';
 import { ChatGateway } from './chat/chat.gateway';
+import { ChatService } from './chat/chat.service';
+import { ConversationModule } from './conversation/conversation.module';
+import { MessageService } from './message/message.service';
+import { ConversationService } from './conversation/conversation.service';
 
 @Module({
   imports: [
@@ -17,8 +21,17 @@ import { ChatGateway } from './chat/chat.gateway';
     ConfigModule.forRoot({
       isGlobal: true,
     }),
+    ConversationModule,
   ],
   controllers: [AppController],
-  providers: [AppService, PrismaService, UserService, ChatGateway],
+  providers: [
+    AppService,
+    PrismaService,
+    UserService,
+    ChatGateway,
+    ChatService,
+    MessageService,
+    ConversationService,
+  ],
 })
 export class AppModule {}

@@ -6,7 +6,7 @@ import { AuthService } from './auth.service';
 
 @Injectable()
 export class CookieStrategy extends PassportStrategy(Strategy, 'jwt') {
-  private readonly logger = new Logger(CookieStrategy.name); // Logger with context
+  private readonly logger = new Logger(CookieStrategy.name);
 
   constructor(
     private authService: AuthService,
@@ -16,21 +16,12 @@ export class CookieStrategy extends PassportStrategy(Strategy, 'jwt') {
       jwtFromRequest: ExtractJwt.fromExtractors([
         (req: any) => {
           let token = null;
-          // Try to extract token from HTTP cookies or WebSocket handshake headers
           if (req) {
             if (req.cookies) {
-              // Log cookies (this should work for HTTP requests)
-              this.logger.debug('Cookies in HTTP request:', req.cookies);
-              token = req.cookies['jwt']; // Extract token from HTTP cookie
+              token = req.cookies['jwt'];
             } else if (req.handshake && req.handshake.headers) {
-              // For WebSocket connection, use handshake headers
-              this.logger.debug(
-                'Headers in WebSocket handshake:',
-                req.handshake.headers,
-              );
               const cookieHeader = req.handshake.headers.cookie;
               if (cookieHeader) {
-                // Parse the JWT from the cookie header manually
                 const cookies = cookieHeader
                   .split('; ')
                   .reduce((acc, cookie) => {
@@ -39,7 +30,6 @@ export class CookieStrategy extends PassportStrategy(Strategy, 'jwt') {
                     return acc;
                   }, {});
 
-                this.logger.debug('Cookies in WebSocket handshake:', cookies);
                 token = cookies['jwt'];
               }
             }
