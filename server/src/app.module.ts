@@ -12,6 +12,7 @@ import { ChatService } from './chat/chat.service';
 import { ConversationModule } from './conversation/conversation.module';
 import { MessageService } from './message/message.service';
 import { ConversationService } from './conversation/conversation.service';
+import { EventsModule } from './events/events.module';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { ConversationService } from './conversation/conversation.service';
       isGlobal: true,
     }),
     ConversationModule,
+    EventsModule,
   ],
   controllers: [AppController],
   providers: [

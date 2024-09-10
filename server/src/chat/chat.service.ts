@@ -20,7 +20,7 @@ export class ChatService {
   async handleMessage(req: any, data: MessageDTO) {
     const senderId = req.user?.userId;
 
-    await this.prisma.$transaction(async (prisma) => {
+    const message = await this.prisma.$transaction(async () => {
       await this.conversationService.validateConversation({
         conversationId: data.conversationId,
         senderId,
@@ -40,5 +40,7 @@ export class ChatService {
 
       return newMessage;
     });
+
+    return message;
   }
 }

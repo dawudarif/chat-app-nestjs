@@ -35,11 +35,11 @@ export class CookieStrategy extends PassportStrategy(Strategy, 'jwt') {
             }
           }
 
-          if (!token) {
-            this.logger.warn('No JWT token found in request');
-          } else {
-            this.logger.debug(`JWT Token found: ${token}`);
-          }
+          // if (!token) {
+          //   this.logger.warn('No JWT token found in request');
+          // } else {
+          //   this.logger.debug(`JWT Token found: ${token}`);
+          // }
 
           return token;
         },
@@ -50,7 +50,7 @@ export class CookieStrategy extends PassportStrategy(Strategy, 'jwt') {
   }
 
   async validate(payload: any) {
-    this.logger.debug(`Validating JWT payload: ${JSON.stringify(payload)}`);
+    // this.logger.debug(`Validating JWT payload: ${JSON.stringify(payload)}`);
     return {
       userId: payload.sub,
       name: payload.name,
