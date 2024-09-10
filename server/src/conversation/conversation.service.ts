@@ -5,9 +5,9 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { ValidateConversation } from './dto/validate-conversation.dto';
-import { UpdateConversationMessage } from './dto/update-converstion-message.dto';
 import { CreateConversation } from './dto/create-conversation.dto';
+import { UpdateConversationMessage } from './dto/update-converstion-message.dto';
+import { ValidateConversation } from './dto/validate-conversation.dto';
 
 @Injectable()
 export class ConversationService {
@@ -33,7 +33,7 @@ export class ConversationService {
       },
     });
 
-    if (updateConversation) {
+    if (!updateConversation) {
       throw new InternalServerErrorException('Internal server error');
     }
 

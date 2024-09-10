@@ -18,7 +18,7 @@ export class ChatService {
   ) {}
 
   async handleMessage(req: any, data: MessageDTO) {
-    const senderId = req.user?.sub;
+    const senderId = req.user?.userId;
 
     await this.prisma.$transaction(async (prisma) => {
       await this.conversationService.validateConversation({
