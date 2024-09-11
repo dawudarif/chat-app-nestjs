@@ -122,6 +122,12 @@ export class ConversationService {
         },
       },
       include: {
+        latestMessage: {
+          select: {
+            senderId: true,
+            body: true,
+          },
+        },
         participants: {
           where: {
             userId: {
