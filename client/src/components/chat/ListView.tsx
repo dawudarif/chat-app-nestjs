@@ -7,7 +7,7 @@ import clsx from "clsx";
 
 interface ListViewProps {
   conversationData?: ConversationData[];
-  conversationId: string;
+  conversationId?: string;
 }
 
 const ListView: React.FC<ListViewProps> = ({
