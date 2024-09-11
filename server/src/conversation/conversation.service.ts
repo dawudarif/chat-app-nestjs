@@ -134,6 +134,7 @@ export class ConversationService {
                 username: true,
                 id: true,
                 email: true,
+                name: true,
               },
             },
           },
