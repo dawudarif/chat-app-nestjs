@@ -10,7 +10,13 @@ export interface ConversationData {
   latestMessageId: string;
   createdAt: Date;
   updatedAt: Date;
+  latestMessage?: LatestMessage;
   participants: Participant[];
+}
+
+export interface LatestMessage {
+  senderId: string;
+  body: string;
 }
 
 export interface Participant {
@@ -28,4 +34,13 @@ export interface User {
   id: string;
   email: string;
   name: string;
+}
+
+export interface Message {
+  id: string;
+  conversationId: string;
+  senderId: string;
+  body: string;
+  createdAt: Date;
+  updatedAt: Date;
 }

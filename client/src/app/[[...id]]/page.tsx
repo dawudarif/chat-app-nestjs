@@ -1,23 +1,32 @@
 "use client";
+import { useEffect, useState } from "react";
 import ProtectedRoute from "../../components/Auth/ProtectedRoute";
-import AppIcon from "../../components/AppIcon";
-import { Suspense, useEffect, useState } from "react";
-import ListView from "../../components/chat/ListView";
 import ChatView from "../../components/chat/ChatView";
-import api from "../../utils/api";
+import ListView from "../../components/chat/ListView";
+import Ring from "../../components/Loaders/Ring";
 import { ConversationData } from "../../types/types";
+import api from "../../utils/api";
 
 export default function Home(props: any) {
   const [loadingScreen, setLoaingScreen] = useState(true);
   const [conversationData, setConversationData] = useState<ConversationData[]>(
     []
   );
+  const [conversationLoading, setConversationLoading] = useState(false);
+
+  const pathnameConversationId = props?.params?.id && props?.params?.id[0];
 
   const getConversations = async () => {
     try {
+      setConversationLoading(true);
+
       const response = await api.get("/conversation/all");
       setConversationData(response.data);
-    } catch (error) {}
+    } catch (error) {
+      console.error("Error fetching conversations:", error);
+    } finally {
+      setConversationLoading(false);
+    }
   };
 
   useEffect(() => {
@@ -27,7 +36,7 @@ export default function Home(props: any) {
   useEffect(() => {
     const timer = setTimeout(() => {
       setLoaingScreen(false);
-    }, 1000);
+    }, 300);
 
     return () => clearTimeout(timer);
   }, []);
@@ -35,7 +44,7 @@ export default function Home(props: any) {
   if (loadingScreen) {
     return (
       <div className="min-h-[30rem] h-[100vh] flex justify-center items-center transition-all duration-500">
-        <AppIcon size={50} />
+        <Ring size={50} color="#0082C8" />
       </div>
     );
   }
@@ -45,11 +54,12 @@ export default function Home(props: any) {
       <div className="flex max-w-full overflow-hidden">
         <ListView
           conversationData={conversationData}
-          conversationId={props.params.id[0]}
+          conversationId={pathnameConversationId}
+          loading={conversationLoading}
         />
         <ChatView
           conversationData={conversationData}
-          conversationId={props.params.id[0]}
+          conversationId={pathnameConversationId}
         />
       </div>
     </ProtectedRoute>
