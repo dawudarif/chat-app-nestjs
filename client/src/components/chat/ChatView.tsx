@@ -1,13 +1,30 @@
 "use client";
-import React, { ChangeEvent, useState } from "react";
+import { Info, Send, X } from "lucide-react";
+import React, { useState } from "react";
+import api from "../../utils/api";
 import Input from "../Custom/Input";
-import { Cross, CrossIcon, Delete, Info, Send, X } from "lucide-react";
+import { ConversationData } from "../../types/types";
 
-export default function ChatView() {
+interface ChatViewProps {
+  conversationData?: ConversationData[];
+  conversationId: string;
+}
+
+const ChatView: React.FC<ChatViewProps> = ({
+  conversationData,
+  conversationId,
+}) => {
   const [messageInput, setMessageInput] = useState("");
+  const [messagesData, setMessagesData] = useState([]);
 
   const handleMessageInput = (e: React.ChangeEvent<HTMLInputElement>) => {
     setMessageInput(e.target.value);
+  };
+
+  const fetchMessages = async () => {
+    try {
+      const response = await api.get(`/message?current=${messagesData.length}`);
+    } catch (error) {}
   };
 
   return (
@@ -42,4 +59,6 @@ export default function ChatView() {
       </div>
     </div>
   );
-}
+};
+
+export default ChatView;
