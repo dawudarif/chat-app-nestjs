@@ -111,4 +111,40 @@ export class ConversationService {
 
     return conversation;
   }
+
+  async getAllConversations(userId: string) {
+    const conversations = await this.prisma.conversation.findMany({
+      where: {
+        participants: {
+          some: {
+            userId: userId,
+          },
+        },
+      },
+      include: {
+        participants: {
+          where: {
+            userId: {
+              not: userId,
+            },
+          },
+          include: {
+            user: {
+              select: {
+                username: true,
+                id: true,
+                email: true,
+              },
+            },
+          },
+        },
+      },
+    });
+
+    if (!conversations) {
+      throw new InternalServerErrorException('Internal server error');
+    }
+
+    return conversations;
+  }
 }
