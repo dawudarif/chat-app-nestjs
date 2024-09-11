@@ -1,10 +1,14 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateMessage } from './dto/create-message.dto';
+import { ConversationService } from '../conversation/conversation.service';
 
 @Injectable()
 export class MessageService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private conversationService: ConversationService,
+  ) {}
 
   async createMessage(data: CreateMessage) {
     const message = await this.prisma.message.create({
@@ -16,5 +20,27 @@ export class MessageService {
     });
 
     return message;
+  }
+
+  async retreiveMessages(conversationId: string, count: number, req: any) {
+    const userId = req.user?.userId;
+
+    const checkConversation =
+      await this.conversationService.checkConversationWithParticipant(
+        userId,
+        conversationId,
+      );
+
+    const messages = await this.prisma.message.findMany({
+      where: {
+        conversationId,
+      },
+      orderBy: {
+        createdAt: 'asc',
+      },
+      skip: count,
+    });
+
+    return messages;
   }
 }
