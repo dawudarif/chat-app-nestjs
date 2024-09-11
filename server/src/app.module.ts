@@ -13,6 +13,8 @@ import { ConversationModule } from './conversation/conversation.module';
 import { MessageService } from './message/message.service';
 import { ConversationService } from './conversation/conversation.service';
 import { EventsModule } from './events/events.module';
+import { MessageController } from './message/message.controller';
+import { MessageModule } from './message/message.module';
 
 @Module({
   imports: [
@@ -24,8 +26,9 @@ import { EventsModule } from './events/events.module';
     }),
     ConversationModule,
     EventsModule,
+    MessageModule,
   ],
-  controllers: [AppController],
+  controllers: [AppController, MessageController],
   providers: [
     AppService,
     PrismaService,

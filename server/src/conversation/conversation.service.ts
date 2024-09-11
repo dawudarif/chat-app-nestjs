@@ -89,4 +89,26 @@ export class ConversationService {
 
     return createConversation;
   }
+
+  async checkConversationWithParticipant(
+    userId: string,
+    conversationId: string,
+  ) {
+    const conversation = await this.prisma.conversation.findUnique({
+      where: {
+        id: conversationId,
+        participants: {
+          some: {
+            userId: userId,
+          },
+        },
+      },
+    });
+
+    if (!conversation) {
+      throw new NotFoundException('Invalid conversation or participant');
+    }
+
+    return conversation;
+  }
 }
