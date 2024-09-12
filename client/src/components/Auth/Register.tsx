@@ -10,6 +10,7 @@ const Register = () => {
   const [error, setError] = useState<null | string>(null);
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState({
+    name: "",
     email: "",
     username: "",
     password: "",
@@ -26,11 +27,11 @@ const Register = () => {
     try {
       const response = await api.post("/auth/signup", data);
 
-      // if (response.status === 201) {
-      //   navigate("/");
-      // } else if (response.status === 401 || response.status === 400) {
-      //   throw new Error();
-      // }
+      if (response.status === 201) {
+        router.push("/");
+      } else if (response.status === 401 || response.status === 400) {
+        throw new Error();
+      }
     } catch (error: any) {
       if (error.isAxiosError) {
         console.log(error);
@@ -49,6 +50,17 @@ const Register = () => {
       <div className="flex justify-center items-center flex-col max-w-[50%] w-full rounded-xl shadow-lg my-16 lg:px-10 px-5 py-10">
         <h1 className="text-h1 text-gray-900 font-semibold">Register</h1>
         <form onSubmit={handleRegister} className="w-full">
+          <label htmlFor="name">
+            <h4 className="text-h4 text-gray-600 mb-3">Name</h4>
+            <Input
+              name="name"
+              handleChange={handleInputChange}
+              value={data.name}
+              placeholder="Enter Name"
+              type="text"
+              otherClasses="w-full mb-3"
+            />
+          </label>
           <label htmlFor="email">
             <h4 className="text-h4 text-gray-600 mb-3">Email</h4>
             <Input
