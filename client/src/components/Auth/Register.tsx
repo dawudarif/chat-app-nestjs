@@ -113,7 +113,7 @@ const Register = () => {
           >
             Register
           </Button>
-          <Link href="/auth" className="text-gray-600 cursor-pointer">
+          <Link href="/auth/login" className="text-gray-600 cursor-pointer">
             Already a user? Login here
           </Link>
         </form>

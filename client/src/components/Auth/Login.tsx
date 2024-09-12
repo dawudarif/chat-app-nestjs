@@ -78,10 +78,7 @@ const Login = () => {
           >
             Login
           </Button>
-          <Link
-            href="/auth?page=register"
-            className="text-gray-600 cursor-pointer"
-          >
+          <Link href="/auth/register" className="text-gray-600 cursor-pointer">
             New here? Click to Register
           </Link>
         </form>
