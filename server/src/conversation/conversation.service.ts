@@ -154,4 +154,46 @@ export class ConversationService {
 
     return conversations;
   }
+
+  async searchConversations(userId: string, text: string) {
+    const search = await this.prisma.conversation.findMany({
+      where: {
+        participants: {
+          some: {
+            user: {
+              id: userId,
+              AND: [
+                { name: { contains: text } },
+                { username: { contains: text } },
+              ],
+            },
+          },
+        },
+      },
+      include: {
+        participants: {
+          where: {
+            userId: {
+              not: userId,
+            },
+          },
+          include: {
+            user: {
+              select: {
+                id: true,
+                name: true,
+                username: true,
+              },
+            },
+          },
+        },
+      },
+    });
+
+    if (!search) {
+      throw new InternalServerErrorException('Internal server error');
+    }
+
+    return search;
+  }
 }

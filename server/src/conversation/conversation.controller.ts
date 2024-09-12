@@ -19,4 +19,13 @@ export class ConversationController {
   async getConversations(@Req() req: any) {
     return this.conversationService.getAllConversations(req.user.userId);
   }
+
+  @UseGuards(CookieGuard)
+  @Post('search')
+  async searchConverations(@Req() req: any, @Body() body: { text: string }) {
+    return this.conversationService.searchConversations(
+      req.user.userId,
+      body.text,
+    );
+  }
 }
