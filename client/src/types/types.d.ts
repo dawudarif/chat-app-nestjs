@@ -44,3 +44,27 @@ export interface Message {
   createdAt: Date;
   updatedAt: Date;
 }
+
+export interface SearchData {
+  id: string;
+  latestMessageId: string;
+  createdAt: Date;
+  updatedAt: Date;
+  participants: Participant[];
+}
+
+export interface Participant {
+  id: string;
+  userId: string;
+  conversationId: string;
+  hasSeenLatestMessage: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+  user: User;
+}
+
+export interface User {
+  id: string;
+  name: string;
+  username: string;
+}
