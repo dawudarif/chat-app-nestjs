@@ -8,10 +8,14 @@ import { PrismaService } from '../prisma/prisma.service';
 import { CreateConversation } from './dto/create-conversation.dto';
 import { UpdateConversationMessage } from './dto/update-converstion-message.dto';
 import { ValidateConversation } from './dto/validate-conversation.dto';
+import { UserService } from '../user/user.service';
 
 @Injectable()
 export class ConversationService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private userService: UserService,
+  ) {}
 
   async updateConversationMessage(data: UpdateConversationMessage) {
     const updateConversation = await this.prisma.conversation.update({
@@ -156,44 +160,17 @@ export class ConversationService {
   }
 
   async searchConversations(userId: string, text: string) {
-    const search = await this.prisma.conversation.findMany({
-      where: {
-        participants: {
-          some: {
-            user: {
-              id: userId,
-              AND: [
-                { name: { contains: text } },
-                { username: { contains: text } },
-              ],
-            },
-          },
-        },
-      },
-      include: {
-        participants: {
-          where: {
-            userId: {
-              not: userId,
-            },
-          },
-          include: {
-            user: {
-              select: {
-                id: true,
-                name: true,
-                username: true,
-              },
-            },
-          },
-        },
-      },
-    });
+    const getUser = await this.userService.getUser(userId);
 
-    if (!search) {
+    const findUsers = await this.userService.findUsersByQuery(
+      text,
+      getUser.username,
+    );
+
+    if (!findUsers) {
       throw new InternalServerErrorException('Internal server error');
     }
 
-    return search;
+    return findUsers;
   }
 }
