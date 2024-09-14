@@ -73,4 +73,23 @@ export class UserService {
 
     return user;
   }
+
+  async findUsersByQuery(query: string, usernameNotInclude: string) {
+    const users = await this.prismaService.user.findMany({
+      where: {
+        username: {
+          contains: query as string,
+          not: usernameNotInclude,
+          mode: 'insensitive',
+        },
+      },
+      select: {
+        id: true,
+        name: true,
+        username: true,
+      },
+    });
+
+    return users;
+  }
 }

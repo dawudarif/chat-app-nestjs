@@ -21,9 +21,8 @@ export class ChatService {
     const senderId = req.user?.userId;
 
     const message = await this.prisma.$transaction(async () => {
-      await this.conversationService.validateConversation({
+      await this.conversationService.getConversationById({
         conversationId: data.conversationId,
-        senderId,
       });
 
       const newMessage = await this.messageService.createMessage({

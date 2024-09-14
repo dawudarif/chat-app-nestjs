@@ -8,10 +8,14 @@ import { PrismaService } from '../prisma/prisma.service';
 import { CreateConversation } from './dto/create-conversation.dto';
 import { UpdateConversationMessage } from './dto/update-converstion-message.dto';
 import { ValidateConversation } from './dto/validate-conversation.dto';
+import { UserService } from '../user/user.service';
 
 @Injectable()
 export class ConversationService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private userService: UserService,
+  ) {}
 
   async updateConversationMessage(data: UpdateConversationMessage) {
     const updateConversation = await this.prisma.conversation.update({
@@ -23,7 +27,10 @@ export class ConversationService {
         participants: {
           update: {
             where: {
-              userId: data.senderId,
+              userId_conversationId: {
+                userId: data.senderId,
+                conversationId: data.conversationId,
+              },
             },
             data: {
               hasSeenLatestMessage: true,
@@ -40,18 +47,14 @@ export class ConversationService {
     return updateConversation;
   }
 
-  async validateConversation(data: ValidateConversation) {
+  async getConversationById(data: ValidateConversation) {
     const checkConversation = await this.prisma.conversation.findUnique({
       where: {
         id: data.conversationId,
       },
     });
 
-    if (checkConversation) {
-      return checkConversation;
-    } else {
-      throw new NotFoundException('Invalid conversation');
-    }
+    return checkConversation;
   }
 
   async createConversation(req: any, data: CreateConversation) {
@@ -156,44 +159,56 @@ export class ConversationService {
   }
 
   async searchConversations(userId: string, text: string) {
-    const search = await this.prisma.conversation.findMany({
+    const getUser = await this.userService.getUser(userId);
+
+    const findUsers = await this.userService.findUsersByQuery(
+      text,
+      getUser.username,
+    );
+
+    if (!findUsers) {
+      throw new InternalServerErrorException('Internal server error');
+    }
+
+    return findUsers;
+  }
+
+  async findConversationByParticipants(participants: string[]) {
+    const conversation = await this.prisma.conversation.findFirst({
       where: {
         participants: {
-          some: {
-            user: {
-              id: userId,
-              AND: [
-                { name: { contains: text } },
-                { username: { contains: text } },
-              ],
-            },
-          },
-        },
-      },
-      include: {
-        participants: {
-          where: {
+          every: {
             userId: {
-              not: userId,
-            },
-          },
-          include: {
-            user: {
-              select: {
-                id: true,
-                name: true,
-                username: true,
-              },
+              in: participants,
             },
           },
         },
       },
     });
 
-    if (!search) {
+    return conversation;
+  }
+
+  async validateConversation(req: any, id: string) {
+    const findById = await this.getConversationById({ conversationId: id });
+
+    if (findById) return { created: false, data: findById };
+
+    const participants: string[] = [req.user.userId, id];
+
+    const findByParticipants =
+      await this.findConversationByParticipants(participants);
+
+    if (findByParticipants) return { created: false, data: findByParticipants };
+
+    const createNewConversation = this.createConversation(req, {
+      participant: id,
+    });
+
+    if (!createNewConversation) {
       throw new InternalServerErrorException('Internal server error');
     }
 
-    return search;
+    return { created: true, data: createNewConversation };
   }
 }
