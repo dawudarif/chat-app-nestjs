@@ -1,8 +1,8 @@
 "use client";
 import { useEffect, useState } from "react";
 import ProtectedRoute from "../../components/Auth/ProtectedRoute";
-import ChatView from "../../components/chat/ChatView";
-import ListView from "../../components/chat/ListView";
+import ChatView from "../../components/chat/ChatView/ChatView";
+import ListView from "../../components/chat/ListView/ListView";
 import Ring from "../../components/Loaders/Ring";
 import { ConversationData } from "../../types/types";
 import api from "../../utils/api";

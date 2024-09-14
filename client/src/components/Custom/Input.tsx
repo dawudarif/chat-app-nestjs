@@ -10,6 +10,7 @@ interface InputProps {
   otherClasses?: string;
   iconSize?: string;
   name: string;
+  iconColor?: string;
   handleChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
@@ -22,9 +23,10 @@ const Input: React.FC<InputProps> = ({
   iconSize = "1.5rem",
   placeholder = "Enter Text",
   name,
+  iconColor,
 }) => {
   const [showPassword, setShowPassword] = useState(false);
-  const color = "#272727";
+  const color = iconColor ?? "#272727";
 
   const handleShowPassword = () => {
     setShowPassword(!showPassword);

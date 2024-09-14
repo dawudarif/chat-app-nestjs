@@ -1,10 +1,14 @@
 import clsx from "clsx";
 import Link from "next/link";
 import React, { useEffect, useState } from "react";
-import { ConversationData, SearchData } from "../../types/types";
-import Input from "../Custom/Input";
-import { useUserContext } from "../../context/UserContext";
-import api from "../../utils/api";
+import { ConversationData, SearchData } from "../../../types/types";
+import Input from "../../Custom/Input";
+import { useUserContext } from "../../../context/UserContext";
+import api from "../../../utils/api";
+import { useRouter } from "next/navigation";
+import Ring from "../../Loaders/Ring";
+import SingleSearchItem from "./SingleSearchItem";
+import SingleConversationItem from "./SingleConversationItem";
 
 interface ListViewProps {
   conversationData?: ConversationData[];
@@ -60,6 +64,7 @@ const ListView: React.FC<ListViewProps> = ({
         placeholder="Search"
         otherClasses="w-full border-l-0 border-t-0 border-r-0 rounded-none"
         type="text"
+        iconColor={search !== "" ? "#0082C8" : undefined}
       />
 
       {loading || searchLoading
@@ -82,23 +87,7 @@ const ListView: React.FC<ListViewProps> = ({
         ? searchData &&
           searchData?.length > 0 &&
           searchData.map((item: SearchData) => {
-            return (
-              <Link
-                href={`/${item.id}`}
-                key={item.id}
-                className="w-full border-b border-brand-dark-gray p-1 group"
-              >
-                <div className="group-hover:bg-brand-filled-blue/90 group-hover:text-white text-brand-black group-hover:rounded-lg transition-all duration-100 p-2 my-[.15rem] cursor-pointer">
-                  <h1 className="font-medium text-base capitalize">
-                    {item.participants[0].user.name}
-                  </h1>
-
-                  <h6 className="text-sm font-normal">
-                    @{item.participants[0].user.username}
-                  </h6>
-                </div>
-              </Link>
-            );
+            return <SingleSearchItem key={item.id} item={item} />;
           })
         : conversationData &&
           conversationData?.length > 0 &&
@@ -107,35 +96,14 @@ const ListView: React.FC<ListViewProps> = ({
               item.latestMessage?.senderId === userInfo?.userId
                 ? "You"
                 : "@" + item.participants[0].user.username?.toLowerCase();
-            return (
-              <Link
-                href={`/${item.id}`}
-                key={item.id}
-                className="w-full border-b border-brand-dark-gray p-1 group"
-              >
-                <div
-                  className={clsx(
-                    item.id === conversationId &&
-                      "bg-brand-filled-blue text-white rounded-lg",
-                    "group-hover:bg-brand-filled-blue/90 group-hover:text-white text-brand-black group-hover:rounded-lg transition-all duration-100 p-2 my-[.15rem] cursor-pointer"
-                  )}
-                >
-                  <h1 className="font-medium text-base capitalize">
-                    {item.participants[0].user.name}
-                  </h1>
 
-                  {item.latestMessage?.body ? (
-                    <h6 className="text-sm italic">
-                      {latestMessageName}
-                      {": "} {item.latestMessage?.body}
-                    </h6>
-                  ) : (
-                    <h6 className="text-sm font-normal">
-                      {item.participants[0].user.username}
-                    </h6>
-                  )}
-                </div>
-              </Link>
+            return (
+              <SingleConversationItem
+                key={item.id}
+                item={item}
+                conversationId={conversationId}
+                latestMessageName={latestMessageName}
+              />
             );
           })}
     </div>

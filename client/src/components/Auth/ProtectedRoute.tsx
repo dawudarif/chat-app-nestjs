@@ -13,6 +13,6 @@ export default function ProtectedRoute({
   if (userInfo?.email) {
     return <>{children}</>;
   } else {
-    router.push("/auth");
+    router.push("/auth/login");
   }
 }
