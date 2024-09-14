@@ -27,7 +27,10 @@ export class ConversationService {
         participants: {
           update: {
             where: {
-              userId: data.senderId,
+              userId_conversationId: {
+                userId: data.senderId,
+                conversationId: data.conversationId,
+              },
             },
             data: {
               hasSeenLatestMessage: true,
@@ -44,18 +47,14 @@ export class ConversationService {
     return updateConversation;
   }
 
-  async validateConversation(data: ValidateConversation) {
+  async getConversationById(data: ValidateConversation) {
     const checkConversation = await this.prisma.conversation.findUnique({
       where: {
         id: data.conversationId,
       },
     });
 
-    if (checkConversation) {
-      return checkConversation;
-    } else {
-      throw new NotFoundException('Invalid conversation');
-    }
+    return checkConversation;
   }
 
   async createConversation(req: any, data: CreateConversation) {
@@ -172,5 +171,44 @@ export class ConversationService {
     }
 
     return findUsers;
+  }
+
+  async findConversationByParticipants(participants: string[]) {
+    const conversation = await this.prisma.conversation.findFirst({
+      where: {
+        participants: {
+          every: {
+            userId: {
+              in: participants,
+            },
+          },
+        },
+      },
+    });
+
+    return conversation;
+  }
+
+  async validateConversation(req: any, id: string) {
+    const findById = await this.getConversationById({ conversationId: id });
+
+    if (findById) return { created: false, data: findById };
+
+    const participants: string[] = [req.user.userId, id];
+
+    const findByParticipants =
+      await this.findConversationByParticipants(participants);
+
+    if (findByParticipants) return { created: false, data: findByParticipants };
+
+    const createNewConversation = this.createConversation(req, {
+      participant: id,
+    });
+
+    if (!createNewConversation) {
+      throw new InternalServerErrorException('Internal server error');
+    }
+
+    return { created: true, data: createNewConversation };
   }
 }

@@ -9,12 +9,6 @@ export class ConversationController {
   constructor(private conversationService: ConversationService) {}
 
   @UseGuards(CookieGuard)
-  @Post('create')
-  async createConversation(@Req() req: any, @Body() data: CreateConversation) {
-    return this.conversationService.createConversation(req, data);
-  }
-
-  @UseGuards(CookieGuard)
   @Get('all')
   async getConversations(@Req() req: any) {
     return this.conversationService.getAllConversations(req.user.userId);
@@ -27,5 +21,17 @@ export class ConversationController {
       req.user.userId,
       body.text,
     );
+  }
+
+  @UseGuards(CookieGuard)
+  @Post('validate')
+  async checkConveration(
+    @Req() req: any,
+    @Body()
+    body: {
+      id: string;
+    },
+  ) {
+    return this.conversationService.validateConversation(req, body.id);
   }
 }

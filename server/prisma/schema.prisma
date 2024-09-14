@@ -36,13 +36,15 @@ model Conversation {
 
 model ConversationParticipant {
   id                   String       @id @default(uuid())
-  userId               String       @unique
+  userId               String
   user                 User         @relation(fields: [userId], references: [id])
   conversationId       String
   conversation         Conversation @relation(fields: [conversationId], references: [id])
   hasSeenLatestMessage Boolean      @default(false)
   createdAt            DateTime     @default(now())
   updatedAt            DateTime     @updatedAt
+
+  @@unique([userId, conversationId])
 }
 
 model Message {
