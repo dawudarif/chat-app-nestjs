@@ -57,64 +57,6 @@ export class ConversationService {
     return checkConversation;
   }
 
-  async createConversation(req: any, data: CreateConversation) {
-    const participantIds: Array<string> = [req.user.userId, data.participant];
-
-    const conversation = await this.prisma.conversation.findFirst({
-      where: {
-        participants: {
-          every: {
-            userId: { in: participantIds },
-          },
-          some: {
-            userId: { in: participantIds },
-          },
-        },
-      },
-      include: {
-        participants: true,
-      },
-    });
-
-    if (conversation) {
-      throw new ConflictException('Conversation with the user exists');
-    }
-
-    const createConversation = await this.prisma.conversation.create({
-      data: {
-        participants: {
-          create: participantIds.map((id) => ({
-            userId: id,
-          })),
-        },
-      },
-    });
-
-    return createConversation;
-  }
-
-  async checkConversationWithParticipant(
-    userId: string,
-    conversationId: string,
-  ) {
-    const conversation = await this.prisma.conversation.findUnique({
-      where: {
-        id: conversationId,
-        participants: {
-          some: {
-            userId: userId,
-          },
-        },
-      },
-    });
-
-    if (!conversation) {
-      throw new NotFoundException('Invalid conversation or participant');
-    }
-
-    return conversation;
-  }
-
   async getAllConversations(userId: string) {
     const conversations = await this.prisma.conversation.findMany({
       where: {
@@ -173,14 +115,12 @@ export class ConversationService {
     return findUsers;
   }
 
-  async findConversationByParticipants(participants: string[]) {
+  async getConversationByParticipants(participantIds: string[]) {
     const conversation = await this.prisma.conversation.findFirst({
       where: {
         participants: {
           every: {
-            userId: {
-              in: participants,
-            },
+            userId: { in: participantIds },
           },
         },
       },
@@ -189,26 +129,30 @@ export class ConversationService {
     return conversation;
   }
 
-  async validateConversation(req: any, id: string) {
-    const findById = await this.getConversationById({ conversationId: id });
+  async createConversation(req: any, data: CreateConversation) {
+    const participantIds: Array<string> = [req.user.userId, data.participant];
 
-    if (findById) return { created: false, data: findById };
+    const existingConversation =
+      await this.getConversationByParticipants(participantIds);
 
-    const participants: string[] = [req.user.userId, id];
+    if (existingConversation) {
+      return { created: false, conversation: existingConversation };
+    }
 
-    const findByParticipants =
-      await this.findConversationByParticipants(participants);
-
-    if (findByParticipants) return { created: false, data: findByParticipants };
-
-    const createNewConversation = this.createConversation(req, {
-      participant: id,
+    const createConversation = await this.prisma.conversation.create({
+      data: {
+        participants: {
+          create: participantIds.map((id) => ({
+            userId: id,
+          })),
+        },
+      },
     });
 
-    if (!createNewConversation) {
+    if (!createConversation) {
       throw new InternalServerErrorException('Internal server error');
     }
 
-    return { created: true, data: createNewConversation };
+    return { created: true, conversation: createConversation };
   }
 }

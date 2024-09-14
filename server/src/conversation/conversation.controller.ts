@@ -24,14 +24,16 @@ export class ConversationController {
   }
 
   @UseGuards(CookieGuard)
-  @Post('validate')
-  async checkConveration(
+  @Post('create')
+  async createConversation(
     @Req() req: any,
     @Body()
     body: {
       id: string;
     },
   ) {
-    return this.conversationService.validateConversation(req, body.id);
+    return this.conversationService.createConversation(req, {
+      participant: body?.id,
+    });
   }
 }
