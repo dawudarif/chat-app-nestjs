@@ -100,7 +100,7 @@ const Register = () => {
               name="confirmPassword"
               handleChange={handleInputChange}
               value={data.confirmPassword}
-              placeholder="Enter ConfirmPassword"
+              placeholder="Confirm Password"
               type="password"
               otherClasses="w-full mb-3"
             />

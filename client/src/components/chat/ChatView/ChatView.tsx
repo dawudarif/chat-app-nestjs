@@ -1,10 +1,11 @@
 "use client";
 import { Info, Send, X } from "lucide-react";
 import React, { useEffect, useState } from "react";
-import api from "../../utils/api";
-import Input from "../Custom/Input";
-import { ConversationData, Message } from "../../types/types";
+import api from "../../../utils/api";
+import Input from "../../Custom/Input";
+import { ConversationData, Message } from "../../../types/types";
 import Link from "next/link";
+import { useRouter, useSearchParams } from "next/navigation";
 
 interface ChatViewProps {
   conversationData?: ConversationData[];
@@ -17,6 +18,9 @@ const ChatView: React.FC<ChatViewProps> = ({
 }) => {
   const [messageInput, setMessageInput] = useState("");
   const [messagesData, setMessagesData] = useState<Message[]>([]);
+  const searchQuery = useSearchParams();
+  const validateParams = searchQuery.get("validate");
+  const router = useRouter();
 
   const handleMessageInput = (e: React.ChangeEvent<HTMLInputElement>) => {
     setMessageInput(e.target.value);
@@ -35,12 +39,6 @@ const ChatView: React.FC<ChatViewProps> = ({
   };
 
   const findUser = conversationData?.find((item) => item.id === conversationId);
-
-  useEffect(() => {
-    if (conversationId) {
-      fetchMessages();
-    }
-  }, []);
 
   if (!findUser) {
     return (
