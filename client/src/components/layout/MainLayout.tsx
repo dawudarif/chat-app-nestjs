@@ -1,7 +1,8 @@
 "use client";
 import React, { useEffect } from "react";
-import api from "../../utils/api";
-import { UserContextProvider, useUserContext } from "../../context/UserContext";
+import { Provider, useDispatch } from "react-redux";
+import { fetchUserProfile } from "../../redux/features/userSlice";
+import store from "../../redux/store";
 
 export default function MainLayout({
   children,
@@ -9,22 +10,17 @@ export default function MainLayout({
   children: React.ReactNode;
 }) {
   return (
-    <UserContextProvider>
+    <Provider store={store}>
       <AuthProviderLayout>{children}</AuthProviderLayout>
-    </UserContextProvider>
+    </Provider>
   );
 }
 
 const AuthProviderLayout = ({ children }: { children: React.ReactNode }) => {
-  const { setUserInfo } = useUserContext();
-
-  const getProfile = async () => {
-    const response = await api.get("/auth/profile");
-    setUserInfo(response.data);
-  };
+  const dispatch = useDispatch();
 
   useEffect(() => {
-    getProfile();
+    dispatch<any>(fetchUserProfile());
   }, []);
 
   return <>{children}</>;

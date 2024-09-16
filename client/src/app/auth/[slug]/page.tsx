@@ -2,15 +2,16 @@
 import { useRouter, useSearchParams } from "next/navigation";
 import Register from "../../../components/Auth/Register";
 import Login from "../../../components/Auth/Login";
-import { useUserContext } from "../../../context/UserContext";
+import { useSelector } from "react-redux";
+import { RootState } from "../../../redux/store";
 
 export default function Auth(props: any) {
   const slug = props?.params?.slug;
   const router = useRouter();
 
-  const { userInfo } = useUserContext();
+  const { userData } = useSelector((store: RootState) => store.user);
 
-  if (userInfo?.email) {
+  if (userData?.email) {
     router.push("/");
   }
 

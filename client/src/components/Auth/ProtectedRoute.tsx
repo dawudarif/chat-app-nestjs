@@ -1,6 +1,7 @@
 "use client";
 import { useRouter } from "next/navigation";
-import { useUserContext } from "../../context/UserContext";
+import { useSelector } from "react-redux";
+import { RootState } from "../../redux/store";
 
 export default function ProtectedRoute({
   children,
@@ -8,9 +9,9 @@ export default function ProtectedRoute({
   children: React.ReactNode;
 }) {
   const router = useRouter();
-  const { userInfo } = useUserContext();
+  const { userData } = useSelector((store: RootState) => store.user);
 
-  if (userInfo?.email) {
+  if (userData?.email) {
     return <>{children}</>;
   } else {
     router.push("/auth/login");
