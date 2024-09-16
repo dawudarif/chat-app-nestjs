@@ -1,11 +1,11 @@
 import { IsNotEmpty, IsString } from 'class-validator';
 
-export class MessageDTO {
+export class MessageBodyDTO {
   @IsNotEmpty()
   @IsString()
-  conversationId: string;
+  message: string;
 
   @IsNotEmpty()
   @IsString()
-  messageBody: string;
+  conversationId: string;
 }

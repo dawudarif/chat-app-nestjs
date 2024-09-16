@@ -2,7 +2,12 @@ import { OnModuleInit } from '@nestjs/common';
 import { WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { Server } from 'socket.io';
 
-@WebSocketGateway()
+@WebSocketGateway({
+  cors: {
+    origin: 'http://localhost:3000/',
+    credentials: true,
+  },
+})
 export class MainGateway implements OnModuleInit {
   @WebSocketServer()
   server: Server;

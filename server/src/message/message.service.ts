@@ -1,4 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import {
+  Injectable,
+  InternalServerErrorException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateMessage } from './dto/create-message.dto';
 import { ConversationService } from '../conversation/conversation.service';
@@ -11,6 +15,19 @@ export class MessageService {
   ) {}
 
   async createMessage(data: CreateMessage) {
+    const userId = data.senderId;
+    const conversationId = data.conversationId;
+
+    const userIsParticipant =
+      await this.conversationService.checkConversationWithParticipant(
+        userId,
+        conversationId,
+      );
+
+    if (!userIsParticipant) {
+      throw new UnauthorizedException("You're not a participant");
+    }
+
     const message = await this.prisma.message.create({
       data: {
         body: data.messageBody,
@@ -18,6 +35,10 @@ export class MessageService {
         senderId: data.senderId,
       },
     });
+
+    if (!message) {
+      throw new InternalServerErrorException('Internal server error');
+    }
 
     return message;
   }
