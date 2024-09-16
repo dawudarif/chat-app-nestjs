@@ -22,6 +22,8 @@ export class MessageController {
     @Query('conversationId') conversationId: string,
     @Req() req: Request,
   ) {
+    if (!conversationId) return;
+
     const retreive = await this.messageService.retreiveMessages(
       conversationId,
       count,
