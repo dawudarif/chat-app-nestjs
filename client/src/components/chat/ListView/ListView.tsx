@@ -1,14 +1,10 @@
-import clsx from "clsx";
-import Link from "next/link";
 import React, { useEffect, useState } from "react";
+import { useSelector } from "react-redux";
 import { ConversationData, SearchData } from "../../../types/types";
-import Input from "../../Custom/Input";
-import { useUserContext } from "../../../context/UserContext";
 import api from "../../../utils/api";
-import { useRouter } from "next/navigation";
-import Ring from "../../Loaders/Ring";
-import SingleSearchItem from "./SingleSearchItem";
+import Input from "../../Custom/Input";
 import SingleConversationItem from "./SingleConversationItem";
+import SingleSearchItem from "./SingleSearchItem";
 
 interface ListViewProps {
   conversationData?: ConversationData[];
@@ -24,7 +20,7 @@ const ListView: React.FC<ListViewProps> = ({
   const [search, setSearch] = useState("");
   const [searchData, setSearchData] = useState<SearchData[]>([]);
   const [searchLoading, setSearchLoading] = useState(false);
-  const { userInfo } = useUserContext();
+  const { userData } = useSelector((store: any) => store.user);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearch(e.target.value);
@@ -93,7 +89,7 @@ const ListView: React.FC<ListViewProps> = ({
           conversationData?.length > 0 &&
           conversationData.map((item: ConversationData) => {
             const latestMessageName =
-              item.latestMessage?.senderId === userInfo?.userId
+              item.latestMessage?.senderId === userData?.userId
                 ? "You"
                 : "@" + item.participants[0].user.username?.toLowerCase();
 

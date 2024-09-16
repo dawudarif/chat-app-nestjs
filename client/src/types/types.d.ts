@@ -50,3 +50,9 @@ export interface SearchData {
   username: string;
   name: string;
 }
+
+export interface UserProfileData {
+  userId: string;
+  name: string;
+  email: string;
+}

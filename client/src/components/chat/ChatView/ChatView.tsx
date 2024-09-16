@@ -18,9 +18,6 @@ const ChatView: React.FC<ChatViewProps> = ({
 }) => {
   const [messageInput, setMessageInput] = useState("");
   const [messagesData, setMessagesData] = useState<Message[]>([]);
-  const searchQuery = useSearchParams();
-  const validateParams = searchQuery.get("validate");
-  const router = useRouter();
 
   const handleMessageInput = (e: React.ChangeEvent<HTMLInputElement>) => {
     setMessageInput(e.target.value);
@@ -38,6 +35,10 @@ const ChatView: React.FC<ChatViewProps> = ({
     } catch (error) {}
   };
 
+  useEffect(() => {
+    fetchMessages();
+  }, []);
+
   const findUser = conversationData?.find((item) => item.id === conversationId);
 
   if (!findUser) {
@@ -52,7 +53,7 @@ const ChatView: React.FC<ChatViewProps> = ({
 
   return (
     <div className="min-h-[100vh] h-full w-full">
-      <div className="flex justify-between items-center p-3 shadow-sm w-full">
+      <div className="flex justify-between items-center p-3 shadow-sm w-full h-full">
         <div className="flex justify-center items-center gap-4">
           <div className="flex justify-center items-center rounded-full h-12 w-12 p-2 bg-brand-black text-white text-h4 uppercase">
             {findUser?.participants[0].user.name.slice(0, 2)}
@@ -69,7 +70,7 @@ const ChatView: React.FC<ChatViewProps> = ({
           <Info size={30} />
         </div>
       </div>
-      <div className="w-full h-[34.5rem] overflow-y-scroll">
+      <div className="w-full h-[80vh] overflow-y-scroll">
         {messagesData.length > 0 &&
           messagesData.map((item) => {
             return <div>{item.body}</div>;
