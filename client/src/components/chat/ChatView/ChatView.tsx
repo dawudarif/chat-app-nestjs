@@ -6,6 +6,7 @@ import Input from "../../Custom/Input";
 import { ConversationData, Message } from "../../../types/types";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
+import { socket } from "../../../utils/socket";
 
 interface ChatViewProps {
   conversationData?: ConversationData[];
@@ -31,12 +32,35 @@ const ChatView: React.FC<ChatViewProps> = ({
           conversationId,
         },
       });
-      setMessagesData([...messagesData, ...response.data]);
+
+      if (response.data) {
+        setMessagesData([...messagesData, ...response.data]);
+        joinConversation();
+      }
     } catch (error) {}
   };
 
+  const joinConversation = () => {
+    socket.emit("joinConversation", { conversationId });
+
+    socket.on("message", (data: Message) => {
+      setMessagesData((prevMessages) => [...prevMessages, data]);
+    });
+  };
+
+  const sendMessage = async () => {
+    if (messageInput.trim() === "") {
+      return;
+    }
+    socket.emit("message", { message: messageInput, conversationId });
+    // setMessagesData([...messagesData, {id:'1',message:messageInput}]);
+    setMessageInput("");
+  };
+
   useEffect(() => {
-    fetchMessages();
+    if (conversationId) {
+      fetchMessages();
+    }
   }, []);
 
   const findUser = conversationData?.find((item) => item.id === conversationId);
@@ -85,7 +109,10 @@ const ChatView: React.FC<ChatViewProps> = ({
           name="message"
           otherClasses="w-full max-w-[94%]"
         />
-        <div className="hover:bg-brand-filled-blue hover:text-white text-brand-black transition-all duration-300 p-2 flex justify-center items-center rounded-md">
+        <div
+          className="hover:bg-brand-filled-blue hover:text-white text-brand-black transition-all duration-300 p-2 flex justify-center items-center rounded-md"
+          onClick={sendMessage}
+        >
           <Send size={30} />
         </div>
       </div>

@@ -6,6 +6,7 @@ import ListView from "../../components/chat/ListView/ListView";
 import Ring from "../../components/Loaders/Ring";
 import { ConversationData } from "../../types/types";
 import api from "../../utils/api";
+import { socket } from "../../utils/socket";
 
 export default function Home(props: any) {
   const [loadingScreen, setLoaingScreen] = useState(true);
@@ -28,6 +29,16 @@ export default function Home(props: any) {
       setConversationLoading(false);
     }
   };
+
+  useEffect(() => {
+    socket.on("connect", () => {
+      console.log("Connected to server");
+    });
+
+    return () => {
+      socket.disconnect();
+    };
+  }, [socket]);
 
   useEffect(() => {
     getConversations();
