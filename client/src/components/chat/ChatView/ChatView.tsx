@@ -1,12 +1,15 @@
 "use client";
 import { Info, Send, X } from "lucide-react";
-import React, { useEffect, useState } from "react";
+import React, { KeyboardEvent, useEffect, useState } from "react";
 import api from "../../../utils/api";
 import Input from "../../Custom/Input";
 import { ConversationData, Message } from "../../../types/types";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { socket } from "../../../utils/socket";
+import { useSelector } from "react-redux";
+import { RootState } from "../../../redux/store";
+import clsx from "clsx";
 
 interface ChatViewProps {
   conversationData?: ConversationData[];
@@ -19,6 +22,7 @@ const ChatView: React.FC<ChatViewProps> = ({
 }) => {
   const [messageInput, setMessageInput] = useState("");
   const [messagesData, setMessagesData] = useState<Message[]>([]);
+  const { userData } = useSelector((store: RootState) => store.user);
 
   const handleMessageInput = (e: React.ChangeEvent<HTMLInputElement>) => {
     setMessageInput(e.target.value);
@@ -44,7 +48,7 @@ const ChatView: React.FC<ChatViewProps> = ({
     socket.emit("joinConversation", { conversationId });
 
     socket.on("message", (data: Message) => {
-      setMessagesData((prevMessages) => [...prevMessages, data]);
+      setMessagesData((prevMessages) => [data, ...prevMessages]);
     });
   };
 
@@ -53,8 +57,26 @@ const ChatView: React.FC<ChatViewProps> = ({
       return;
     }
     socket.emit("message", { message: messageInput, conversationId });
-    // setMessagesData([...messagesData, {id:'1',message:messageInput}]);
+    if (conversationId && userData?.userId) {
+      setMessagesData([
+        {
+          id: `id-${Math.random()}`,
+          conversationId: conversationId,
+          senderId: userData?.userId,
+          body: messageInput,
+          createdAt: new Date(Date.now()),
+          updatedAt: new Date(Date.now()),
+        },
+        ...messagesData,
+      ]);
+    }
     setMessageInput("");
+  };
+
+  const handleKeyPress = (event: KeyboardEvent<HTMLInputElement>) => {
+    if (event.key === "Enter") {
+      sendMessage();
+    }
   };
 
   useEffect(() => {
@@ -94,10 +116,30 @@ const ChatView: React.FC<ChatViewProps> = ({
           <Info size={30} />
         </div>
       </div>
-      <div className="w-full h-[80vh] overflow-y-scroll">
+      <div className="w-full h-[80vh] overflow-y-scroll scrollbar-none px-5 flex flex-col-reverse gap-1">
         {messagesData.length > 0 &&
           messagesData.map((item) => {
-            return <div>{item.body}</div>;
+            const matchUserId = item.senderId === userData?.userId;
+
+            return (
+              <div
+                className={clsx(
+                  matchUserId ? "justify-end" : "justify-start",
+                  "flex"
+                )}
+              >
+                <span
+                  className={clsx(
+                    matchUserId
+                      ? "bg-brand-dark-gray/50"
+                      : "bg-brand-filled-blue",
+                    "px-2 py-2 rounded-2xl text-white text-lg"
+                  )}
+                >
+                  {item.body}
+                </span>
+              </div>
+            );
           })}
       </div>
       <div className="w-full flex justify-start items-center gap-2 mx-1 py-2">
@@ -105,6 +147,7 @@ const ChatView: React.FC<ChatViewProps> = ({
           type="text"
           handleChange={handleMessageInput}
           value={messageInput}
+          onKeyPress={handleKeyPress}
           placeholder="Enter Message"
           name="message"
           otherClasses="w-full max-w-[94%]"

@@ -1,5 +1,5 @@
 import clsx from "clsx";
-import React, { useState } from "react";
+import React, { KeyboardEvent, useState } from "react";
 import { Eye, EyeOff, Search } from "lucide-react";
 
 interface InputProps {
@@ -12,6 +12,7 @@ interface InputProps {
   name: string;
   iconColor?: string;
   handleChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  onKeyPress?: (e: KeyboardEvent<HTMLInputElement>) => void;
 }
 
 const Input: React.FC<InputProps> = ({
@@ -24,6 +25,7 @@ const Input: React.FC<InputProps> = ({
   placeholder = "Enter Text",
   name,
   iconColor,
+  onKeyPress,
 }) => {
   const [showPassword, setShowPassword] = useState(false);
   const color = iconColor ?? "#272727";
@@ -52,6 +54,7 @@ const Input: React.FC<InputProps> = ({
             value={value}
             onChange={handleChange}
             placeholder={placeholder}
+            onKeyPress={onKeyPress}
             className="focus:outline-none w-[95%]"
           />
           <span className="w-[5%]">
@@ -81,6 +84,7 @@ const Input: React.FC<InputProps> = ({
             value={value}
             onChange={handleChange}
             placeholder={placeholder}
+            onKeyPress={onKeyPress}
             className="focus:outline-none w-[95%]"
           />
           <span className="w-[5%]">
@@ -100,6 +104,7 @@ const Input: React.FC<InputProps> = ({
           name={name}
           placeholder={placeholder}
           onChange={handleChange}
+          onKeyPress={onKeyPress}
           className={classes}
         />
       );
