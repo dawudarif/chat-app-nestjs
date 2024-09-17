@@ -129,6 +129,28 @@ export class ConversationService {
     return conversation;
   }
 
+  async checkConversationWithParticipant(
+    userId: string,
+    conversationId: string,
+  ) {
+    const conversation = await this.prisma.conversation.findFirst({
+      where: {
+        id: conversationId,
+        participants: {
+          some: {
+            userId: userId,
+          },
+        },
+      },
+    });
+
+    if (!conversation) {
+      throw new NotFoundException('Conversation not found');
+    }
+
+    return conversation;
+  }
+
   async createConversation(req: any, data: CreateConversation) {
     const participantIds: Array<string> = [req.user.userId, data.participant];
 

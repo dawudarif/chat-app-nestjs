@@ -57,7 +57,7 @@ export class MessageService {
         conversationId,
       },
       orderBy: {
-        createdAt: 'asc',
+        createdAt: 'desc',
       },
       skip: count,
     });
