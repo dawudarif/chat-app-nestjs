@@ -10,6 +10,7 @@ import { socket } from "../../../utils/socket";
 import { useSelector } from "react-redux";
 import { RootState } from "../../../redux/store";
 import clsx from "clsx";
+import SingleMessage from "./SingleMessage";
 
 interface ChatViewProps {
   conversationData?: ConversationData[];
@@ -39,7 +40,6 @@ const ChatView: React.FC<ChatViewProps> = ({
 
       if (response.data) {
         setMessagesData([...messagesData, ...response.data]);
-        joinConversation();
       }
     } catch (error) {}
   };
@@ -64,8 +64,8 @@ const ChatView: React.FC<ChatViewProps> = ({
           conversationId: conversationId,
           senderId: userData?.userId,
           body: messageInput,
-          createdAt: new Date(Date.now()),
-          updatedAt: new Date(Date.now()),
+          createdAt: `${new Date(Date.now())}`,
+          updatedAt: `${new Date(Date.now())}`,
         },
         ...messagesData,
       ]);
@@ -85,6 +85,20 @@ const ChatView: React.FC<ChatViewProps> = ({
     }
   }, []);
 
+  useEffect(() => {
+    if (conversationId) {
+      socket.on("connect", () => {
+        console.log("Socket connected, rejoining conversation...");
+        joinConversation();
+      });
+
+      return () => {
+        socket.off("message");
+        socket.off("connect");
+      };
+    }
+  }, [conversationId, socket]);
+
   const findUser = conversationData?.find((item) => item.id === conversationId);
 
   if (!findUser) {
@@ -98,7 +112,7 @@ const ChatView: React.FC<ChatViewProps> = ({
   }
 
   return (
-    <div className="min-h-[100vh] h-full w-full">
+    <div className="min-h-[100vh] h-full w-[80%]">
       <div className="flex justify-between items-center p-3 shadow-sm w-full h-full">
         <div className="flex justify-center items-center gap-4">
           <div className="flex justify-center items-center rounded-full h-12 w-12 p-2 bg-brand-black text-white text-h4 uppercase">
@@ -116,29 +130,20 @@ const ChatView: React.FC<ChatViewProps> = ({
           <Info size={30} />
         </div>
       </div>
-      <div className="w-full h-[80vh] overflow-y-scroll scrollbar-none px-5 flex flex-col-reverse gap-1">
+      <div className="w-full h-[80vh] overflow-y-scroll scrollbar-none px-2 flex flex-col-reverse gap-1">
         {messagesData.length > 0 &&
-          messagesData.map((item) => {
+          messagesData.map((item, index) => {
             const matchUserId = item.senderId === userData?.userId;
 
             return (
-              <div
-                className={clsx(
-                  matchUserId ? "justify-end" : "justify-start",
-                  "flex"
-                )}
-              >
-                <span
-                  className={clsx(
-                    matchUserId
-                      ? "bg-brand-dark-gray/50"
-                      : "bg-brand-filled-blue",
-                    "px-2 py-2 rounded-2xl text-white text-lg"
-                  )}
-                >
-                  {item.body}
-                </span>
-              </div>
+              <SingleMessage
+                key={index}
+                index={index}
+                length={messagesData.length}
+                message={item}
+                messages={messagesData}
+                sentByMe={matchUserId}
+              />
             );
           })}
       </div>

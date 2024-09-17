@@ -8,8 +8,8 @@ export interface InputChangeProps {
 export interface ConversationData {
   id: string;
   latestMessageId: string;
-  createdAt: Date;
-  updatedAt: Date;
+  createdAt: string;
+  updatedAt: string;
   latestMessage?: LatestMessage;
   participants: Participant[];
 }
@@ -24,8 +24,8 @@ export interface Participant {
   userId: string;
   conversationId: string;
   hasSeenLatestMessage: boolean;
-  createdAt: Date;
-  updatedAt: Date;
+  createdAt: string;
+  updatedAt: string;
   user: User;
 }
 
@@ -41,8 +41,8 @@ export interface Message {
   conversationId: string;
   senderId: string;
   body: string;
-  createdAt: Date;
-  updatedAt: Date;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface SearchData {
