@@ -11,7 +11,6 @@ export const fetchUserProfile = createAsyncThunk(
       return response.data;
     } catch (error) {
       console.log(error);
-      window.location.href = "/auth/login";
       return thunkAPI.rejectWithValue(
         "Something went wrong please try again later."
       );
