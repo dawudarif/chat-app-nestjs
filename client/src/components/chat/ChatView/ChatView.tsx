@@ -1,5 +1,5 @@
 "use client";
-import { Info, Send, X } from "lucide-react";
+import { ChevronLeft, Info, Send, X } from "lucide-react";
 import React, { KeyboardEvent, useEffect, useState } from "react";
 import api from "../../../utils/api";
 import Input from "../../Custom/Input";
@@ -87,14 +87,21 @@ const ChatView: React.FC<ChatViewProps> = ({
 
   useEffect(() => {
     if (conversationId) {
-      socket.on("connect", () => {
+      const handleConnect = () => {
         console.log("Socket connected, rejoining conversation...");
         joinConversation();
-      });
+      };
+
+      if (socket.connected) {
+        handleConnect();
+      } else {
+        socket.on("connect", handleConnect);
+      }
 
       return () => {
         socket.off("message");
-        socket.off("connect");
+        socket.off("joinConversation");
+        socket.off("connect", handleConnect);
       };
     }
   }, [conversationId, socket]);
@@ -124,10 +131,13 @@ const ChatView: React.FC<ChatViewProps> = ({
         </div>
 
         <div className="flex justify-center items-center gap-2">
-          <Link href="/">
-            <X size={30} />
+          <Link
+            href="/"
+            className="rounded-md hover:bg-slate-100 p-2 flex justify-center items-center gap-2"
+          >
+            <ChevronLeft color="#272727" size={25} />
+            <p className="text-base text-brand-black font-medium">Back</p>
           </Link>
-          <Info size={30} />
         </div>
       </div>
       <div className="w-full h-[80vh] overflow-y-scroll scrollbar-none px-2 flex flex-col-reverse gap-1">

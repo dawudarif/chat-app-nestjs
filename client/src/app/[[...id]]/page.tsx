@@ -7,6 +7,8 @@ import Ring from "../../components/Loaders/Ring";
 import { ConversationData } from "../../types/types";
 import api from "../../utils/api";
 import { socket } from "../../utils/socket";
+import { useSelector } from "react-redux";
+import store, { RootState } from "../../redux/store";
 
 export default function Home(props: any) {
   const [loadingScreen, setLoadingScreen] = useState(true);
@@ -14,7 +16,7 @@ export default function Home(props: any) {
     []
   );
   const [conversationLoading, setConversationLoading] = useState(false);
-
+  const { userData } = useSelector((store: RootState) => store.user);
   const pathnameConversationId = props?.params?.id && props?.params?.id[0];
 
   const getConversations = async () => {
@@ -31,14 +33,19 @@ export default function Home(props: any) {
   };
 
   useEffect(() => {
+    socket.connect();
     socket.on("connect", () => {
       console.log("Connected to server");
     });
+    if (userData?.userId) {
+      console.log(`socket joined to ${userData.userId}`);
+      socket.emit("join", userData.userId);
+    }
 
     return () => {
       socket.disconnect();
     };
-  }, [socket]);
+  }, [socket, userData?.userId]);
 
   useEffect(() => {
     getConversations();
