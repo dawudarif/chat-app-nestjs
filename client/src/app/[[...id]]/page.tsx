@@ -9,7 +9,7 @@ import api from "../../utils/api";
 import { socket } from "../../utils/socket";
 
 export default function Home(props: any) {
-  const [loadingScreen, setLoaingScreen] = useState(true);
+  const [loadingScreen, setLoadingScreen] = useState(true);
   const [conversationData, setConversationData] = useState<ConversationData[]>(
     []
   );
@@ -46,7 +46,7 @@ export default function Home(props: any) {
 
   useEffect(() => {
     const timer = setTimeout(() => {
-      setLoaingScreen(false);
+      setLoadingScreen(false);
     }, 300);
 
     return () => clearTimeout(timer);

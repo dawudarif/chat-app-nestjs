@@ -1,4 +1,4 @@
-import { Req, UseGuards } from '@nestjs/common';
+import { Req, Request, UseGuards } from '@nestjs/common';
 import {
   ConnectedSocket,
   MessageBody,
@@ -8,7 +8,7 @@ import {
 import { CookieGuard } from '../auth/cookie.guard';
 import { MessageService } from './message.service';
 import { MessageBodyDTO } from './dto/message-body.dto';
-// import Socket from '@nestjs/platform-socket.io';
+import { Socket } from 'socket.io';
 
 @WebSocketGateway({
   cors: {
@@ -24,7 +24,7 @@ export class MessageGateway {
   async handleMessage(
     @MessageBody() data: MessageBodyDTO,
     @Req() req: any,
-    @ConnectedSocket() client: any,
+    @ConnectedSocket() client: Socket,
   ) {
     const message = await this.messageService.createMessage({
       senderId: req.user.userId,

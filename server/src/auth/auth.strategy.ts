@@ -30,7 +30,7 @@ export class CookieStrategy extends PassportStrategy(Strategy, 'jwt') {
                     return acc;
                   }, {});
 
-                token = cookies['jwt'];
+                token = cookies?.jwt;
               }
             }
           }
