@@ -32,6 +32,6 @@ export class MessageGateway {
       messageBody: data.message,
     });
 
-    client.broadcast.to(data.conversationId).emit('message', message);
+    client.broadcast.to(message.conversationId).emit('message', message);
   }
 }

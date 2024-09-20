@@ -28,19 +28,30 @@ export class MessageService {
       throw new UnauthorizedException("You're not a participant");
     }
 
-    const message = await this.prisma.message.create({
-      data: {
-        body: data.messageBody,
-        conversationId: data.conversationId,
-        senderId: data.senderId,
-      },
+    const create = await this.prisma.$transaction(async () => {
+      const message = await this.prisma.message.create({
+        data: {
+          body: data.messageBody,
+          conversationId: data.conversationId,
+          senderId: data.senderId,
+        },
+      });
+
+      const updateConversation =
+        await this.conversationService.updateConversationMessage({
+          conversationId: message.conversationId,
+          messageId: message.id,
+          senderId: message.senderId,
+        });
+
+      return message;
     });
 
-    if (!message) {
+    if (!create) {
       throw new InternalServerErrorException('Internal server error');
     }
 
-    return message;
+    return create;
   }
 
   async retreiveMessages(conversationId: string, count: number, req: any) {
