@@ -1,29 +1,22 @@
 "use client";
-import { ChevronLeft, Info, Send, X } from "lucide-react";
-import React, { KeyboardEvent, useEffect, useState } from "react";
-import api from "../../../utils/api";
-import Input from "../../Custom/Input";
-import { ConversationData, Message } from "../../../types/types";
+import { ChevronLeft, Send } from "lucide-react";
 import Link from "next/link";
-import { useRouter, useSearchParams } from "next/navigation";
-import { socket } from "../../../utils/socket";
+import React, { KeyboardEvent, useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { RootState } from "../../../redux/store";
-import clsx from "clsx";
+import { Message } from "../../../types/types";
+import api from "../../../utils/api";
+import { socket } from "../../../utils/socket";
+import Input from "../../Custom/Input";
 import SingleMessage from "./SingleMessage";
 
-interface ChatViewProps {
-  conversationData?: ConversationData[];
-  conversationId?: string;
-}
-
-const ChatView: React.FC<ChatViewProps> = ({
-  conversationData,
-  conversationId,
-}) => {
+const ChatView = () => {
   const [messageInput, setMessageInput] = useState("");
   const [messagesData, setMessagesData] = useState<Message[]>([]);
   const { userData } = useSelector((store: RootState) => store.user);
+  const { currentConversation: conversationId, conversations } = useSelector(
+    (store: RootState) => store.conversation
+  );
 
   const handleMessageInput = (e: React.ChangeEvent<HTMLInputElement>) => {
     setMessageInput(e.target.value);
@@ -39,6 +32,8 @@ const ChatView: React.FC<ChatViewProps> = ({
       });
 
       if (response.data) {
+        console.log(response.data);
+
         setMessagesData([...messagesData, ...response.data]);
       }
     } catch (error) {}
@@ -92,21 +87,27 @@ const ChatView: React.FC<ChatViewProps> = ({
         joinConversation();
       };
 
+      // If already connected, rejoin immediately, otherwise listen for connection
       if (socket.connected) {
         handleConnect();
       } else {
         socket.on("connect", handleConnect);
       }
 
+      socket.on("reconnect", () => {
+        console.log("Successfully reconnected");
+        handleConnect();
+      });
+
       return () => {
-        socket.off("message");
-        socket.off("joinConversation");
-        socket.off("connect", handleConnect);
+        socket.off("message"); // Remove the message listener
+        socket.off("connect", handleConnect); // Clean up connect listener
+        socket.off("reconnect", handleConnect); // Clean up reconnect listener
       };
     }
   }, [conversationId, socket]);
 
-  const findUser = conversationData?.find((item) => item.id === conversationId);
+  const findUser = conversations?.find((item) => item.id === conversationId);
 
   if (!findUser) {
     return (

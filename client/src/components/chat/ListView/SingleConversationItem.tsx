@@ -1,7 +1,8 @@
-import React from "react";
-import { ConversationData } from "../../../types/types";
-import Link from "next/link";
 import clsx from "clsx";
+import React from "react";
+import { useDispatch } from "react-redux";
+import { setCurrentConversation } from "../../../redux/features/conversationSlice";
+import { ConversationData } from "../../../types/types";
 
 interface SingleConversationItemProps {
   item: ConversationData;
@@ -14,9 +15,14 @@ const SingleConversationItem: React.FC<SingleConversationItemProps> = ({
   conversationId,
   latestMessageName,
 }) => {
+  const dispatch = useDispatch();
+  const handleConversationChange = () => {
+    dispatch(setCurrentConversation(item.id));
+  };
+
   return (
-    <Link
-      href={`/${item.id}`}
+    <div
+      onClick={handleConversationChange}
       className="w-full border-b border-brand-dark-gray p-1 group"
     >
       <div
@@ -41,7 +47,7 @@ const SingleConversationItem: React.FC<SingleConversationItemProps> = ({
           </h6>
         )}
       </div>
-    </Link>
+    </div>
   );
 };
 export default SingleConversationItem;
