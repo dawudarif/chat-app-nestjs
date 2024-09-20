@@ -2,21 +2,23 @@
 import { ChevronLeft, Send } from "lucide-react";
 import Link from "next/link";
 import React, { KeyboardEvent, useEffect, useState } from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../../../redux/store";
 import { Message } from "../../../types/types";
 import api from "../../../utils/api";
 import { socket } from "../../../utils/socket";
 import Input from "../../Custom/Input";
 import SingleMessage from "./SingleMessage";
+import { setMessagesData } from "../../../redux/features/messagesSlice";
 
 const ChatView = () => {
   const [messageInput, setMessageInput] = useState("");
-  const [messagesData, setMessagesData] = useState<Message[]>([]);
   const { userData } = useSelector((store: RootState) => store.user);
   const { currentConversation: conversationId, conversations } = useSelector(
     (store: RootState) => store.conversation
   );
+  const { messagesData } = useSelector((store: RootState) => store.message);
+  const dispatch = useDispatch();
 
   const handleMessageInput = (e: React.ChangeEvent<HTMLInputElement>) => {
     setMessageInput(e.target.value);
@@ -36,17 +38,9 @@ const ChatView = () => {
       });
 
       if (response.data) {
-        setMessagesData([...initialMessages, ...response.data]);
+        dispatch(setMessagesData([...initialMessages, ...response.data]));
       }
     } catch (error) {}
-  };
-
-  const joinConversation = () => {
-    socket.emit("joinConversation", { conversationId });
-
-    socket.on("message", (data: Message) => {
-      setMessagesData((prevMessages) => [data, ...prevMessages]);
-    });
   };
 
   const sendMessage = async () => {
@@ -81,33 +75,6 @@ const ChatView = () => {
       fetchMessages();
     }
   }, [conversationId]);
-
-  useEffect(() => {
-    if (conversationId) {
-      const handleConnect = () => {
-        console.log("Socket connected, rejoining conversation...");
-        joinConversation();
-      };
-
-      // If already connected, rejoin immediately, otherwise listen for connection
-      if (socket.connected) {
-        handleConnect();
-      } else {
-        socket.on("connect", handleConnect);
-      }
-
-      socket.on("reconnect", () => {
-        console.log("Successfully reconnected");
-        handleConnect();
-      });
-
-      return () => {
-        socket.off("message"); // Remove the message listener
-        socket.off("connect", handleConnect); // Clean up connect listener
-        socket.off("reconnect", handleConnect); // Clean up reconnect listener
-      };
-    }
-  }, [conversationId, socket]);
 
   const findUser = conversations?.find((item) => item.id === conversationId);
 

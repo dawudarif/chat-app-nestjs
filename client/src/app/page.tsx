@@ -1,28 +1,39 @@
 "use client";
 import { useEffect, useState } from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import ProtectedRoute from "../components/Auth/ProtectedRoute";
 import ChatView from "../components/chat/ChatView/ChatView";
 import ListView from "../components/chat/ListView/ListView";
 import Ring from "../components/Loaders/Ring";
 import { RootState } from "../redux/store";
 import { socket } from "../utils/socket";
+import { Message } from "../types/types";
+import { setMessagesData } from "../redux/features/messagesSlice";
 
 export default function Home() {
   const [loadingScreen, setLoadingScreen] = useState(true);
   const { userData } = useSelector((store: RootState) => store.user);
-  const { currentConversation } = useSelector(
+  const { currentConversation: conversationId } = useSelector(
     (store: RootState) => store.conversation
   );
+  const dispatch = useDispatch();
+
+  const joinConversation = () => {
+    socket.emit("joinConversation", { conversationId });
+
+    socket.on("message", (data: Message) => {
+      dispatch(setMessagesData(data));
+    });
+  };
 
   useEffect(() => {
     socket.disconnect();
     socket.connect();
     socket.on("connect", () => {
-      console.log("Connected to server");
+      // console.log("Connected to server");
     });
     if (userData?.userId) {
-      console.log(`socket joined to ${userData.userId}`);
+      // console.log(`socket joined to ${userData.userId}`);
       socket.emit("join", userData.userId);
     }
 
@@ -30,6 +41,32 @@ export default function Home() {
       socket.disconnect();
     };
   }, [socket, userData?.userId]);
+
+  useEffect(() => {
+    if (conversationId) {
+      const handleConnect = () => {
+        console.log("Socket connected, rejoining conversation...");
+        joinConversation();
+      };
+
+      if (socket.connected) {
+        handleConnect();
+      } else {
+        socket.on("connect", handleConnect);
+      }
+
+      socket.on("reconnect", () => {
+        console.log("Successfully reconnected");
+        handleConnect();
+      });
+
+      return () => {
+        socket.off("message");
+        socket.off("connect", handleConnect);
+        socket.off("reconnect", handleConnect);
+      };
+    }
+  }, [conversationId, socket]);
 
   useEffect(() => {
     const timer = setTimeout(() => {
