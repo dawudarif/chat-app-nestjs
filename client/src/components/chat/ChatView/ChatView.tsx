@@ -1,15 +1,17 @@
 "use client";
 import { ChevronLeft, Send } from "lucide-react";
-import Link from "next/link";
 import React, { KeyboardEvent, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { setCurrentConversation } from "../../../redux/features/conversationSlice";
+import {
+  addNewMessage,
+  setMessagesData,
+} from "../../../redux/features/messagesSlice";
 import { RootState } from "../../../redux/store";
-import { Message } from "../../../types/types";
 import api from "../../../utils/api";
 import { socket } from "../../../utils/socket";
 import Input from "../../Custom/Input";
 import SingleMessage from "./SingleMessage";
-import { setMessagesData } from "../../../redux/features/messagesSlice";
 
 const ChatView = () => {
   const [messageInput, setMessageInput] = useState("");
@@ -49,17 +51,16 @@ const ChatView = () => {
     }
     socket.emit("message", { message: messageInput, conversationId });
     if (conversationId && userData?.userId) {
-      setMessagesData([
-        {
+      dispatch(
+        addNewMessage({
           id: `id-${Math.random()}`,
           conversationId: conversationId,
           senderId: userData?.userId,
           body: messageInput,
           createdAt: `${new Date(Date.now())}`,
           updatedAt: `${new Date(Date.now())}`,
-        },
-        ...messagesData,
-      ]);
+        })
+      );
     }
     setMessageInput("");
   };
@@ -89,7 +90,7 @@ const ChatView = () => {
   }
 
   return (
-    <div className="min-h-[100vh] h-full w-[80%]">
+    <div className="min-h-[100vh] h-full !w-[80%]">
       <div className="flex justify-between items-center p-3 shadow-sm w-full h-full">
         <div className="flex justify-center items-center gap-4">
           <div className="flex justify-center items-center rounded-full h-12 w-12 p-2 bg-brand-black text-white text-h4 uppercase">
@@ -101,13 +102,13 @@ const ChatView = () => {
         </div>
 
         <div className="flex justify-center items-center gap-2">
-          <Link
-            href="/"
-            className="rounded-md hover:bg-slate-100 p-2 flex justify-center items-center gap-2"
+          <div
+            onClick={() => dispatch(setCurrentConversation(null))}
+            className="rounded-md hover:bg-slate-100 p-2 flex justify-center items-center gap-2 cursor-pointer"
           >
             <ChevronLeft color="#272727" size={25} />
             <p className="text-base text-brand-black font-medium">Back</p>
-          </Link>
+          </div>
         </div>
       </div>
       <div className="w-full h-[80vh] overflow-y-scroll scrollbar-none px-2 flex flex-col-reverse gap-1">
