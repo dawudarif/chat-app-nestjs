@@ -1,9 +1,10 @@
-import React, { useState } from "react";
-import Ring from "../../Loaders/Ring";
 import clsx from "clsx";
-import api from "../../../utils/api";
-import { useRouter } from "next/navigation";
+import React, { useState } from "react";
+import { useDispatch } from "react-redux";
+import { setCurrentConversation } from "../../../redux/features/conversationSlice";
 import { SearchData } from "../../../types/types";
+import api from "../../../utils/api";
+import Ring from "../../Loaders/Ring";
 
 interface SingleSearchItemProps {
   item: SearchData;
@@ -11,7 +12,7 @@ interface SingleSearchItemProps {
 
 const SingleSearchItem: React.FC<SingleSearchItemProps> = ({ item }) => {
   const [loading, setLoading] = useState(false);
-  const router = useRouter();
+  const dispatch = useDispatch();
 
   const createConversation = async () => {
     if (loading) return;
@@ -20,7 +21,7 @@ const SingleSearchItem: React.FC<SingleSearchItemProps> = ({ item }) => {
       const response = await api.post("/conversation/create", { id: item.id });
 
       if (response.data) {
-        router.push(`/${response.data.conversation.id}`);
+        dispatch(setCurrentConversation(item.id));
       }
     } catch (error) {
     } finally {

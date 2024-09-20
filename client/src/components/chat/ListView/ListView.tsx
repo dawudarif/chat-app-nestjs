@@ -1,26 +1,24 @@
 import React, { useEffect, useState } from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { ConversationData, SearchData } from "../../../types/types";
 import api from "../../../utils/api";
 import Input from "../../Custom/Input";
 import SingleConversationItem from "./SingleConversationItem";
 import SingleSearchItem from "./SingleSearchItem";
+import { RootState } from "../../../redux/store";
+import { setConversations } from "../../../redux/features/conversationSlice";
 
-interface ListViewProps {
-  conversationData?: ConversationData[];
-  conversationId?: string;
-  loading: boolean;
-}
-
-const ListView: React.FC<ListViewProps> = ({
-  conversationData,
-  conversationId,
-  loading,
-}) => {
+const ListView = () => {
   const [search, setSearch] = useState("");
   const [searchData, setSearchData] = useState<SearchData[]>([]);
   const [searchLoading, setSearchLoading] = useState(false);
-  const { userData } = useSelector((store: any) => store.user);
+  const [loading, setLoading] = useState(false);
+
+  const { userData } = useSelector((store: RootState) => store.user);
+  const { currentConversation, conversations } = useSelector(
+    (store: RootState) => store.conversation
+  );
+  const dispatch = useDispatch();
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearch(e.target.value);
@@ -38,6 +36,21 @@ const ListView: React.FC<ListViewProps> = ({
       setSearchLoading(false);
     }
   };
+
+  const getConversations = async () => {
+    try {
+      setLoading(true);
+      const response = await api.get("/conversation/all");
+      dispatch(setConversations(response.data));
+    } catch (error) {
+      console.error("Error fetching conversations:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+  useEffect(() => {
+    getConversations();
+  }, []);
 
   useEffect(() => {
     if (search === "") {
@@ -85,9 +98,9 @@ const ListView: React.FC<ListViewProps> = ({
           searchData.map((item: SearchData) => {
             return <SingleSearchItem key={item.id} item={item} />;
           })
-        : conversationData &&
-          conversationData?.length > 0 &&
-          conversationData.map((item: ConversationData) => {
+        : conversations &&
+          conversations?.length > 0 &&
+          conversations.map((item: ConversationData) => {
             const latestMessageName =
               item.latestMessage?.senderId === userData?.userId
                 ? "You"
@@ -97,7 +110,7 @@ const ListView: React.FC<ListViewProps> = ({
               <SingleConversationItem
                 key={item.id}
                 item={item}
-                conversationId={conversationId}
+                conversationId={currentConversation}
                 latestMessageName={latestMessageName}
               />
             );

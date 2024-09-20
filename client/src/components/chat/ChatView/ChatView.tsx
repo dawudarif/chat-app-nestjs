@@ -1,55 +1,46 @@
 "use client";
-import { ChevronLeft, Info, Send, X } from "lucide-react";
-import React, { KeyboardEvent, useEffect, useState } from "react";
-import api from "../../../utils/api";
-import Input from "../../Custom/Input";
-import { ConversationData, Message } from "../../../types/types";
+import { ChevronLeft, Send } from "lucide-react";
 import Link from "next/link";
-import { useRouter, useSearchParams } from "next/navigation";
-import { socket } from "../../../utils/socket";
-import { useSelector } from "react-redux";
+import React, { KeyboardEvent, useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../../../redux/store";
-import clsx from "clsx";
+import { Message } from "../../../types/types";
+import api from "../../../utils/api";
+import { socket } from "../../../utils/socket";
+import Input from "../../Custom/Input";
 import SingleMessage from "./SingleMessage";
+import { setMessagesData } from "../../../redux/features/messagesSlice";
 
-interface ChatViewProps {
-  conversationData?: ConversationData[];
-  conversationId?: string;
-}
-
-const ChatView: React.FC<ChatViewProps> = ({
-  conversationData,
-  conversationId,
-}) => {
+const ChatView = () => {
   const [messageInput, setMessageInput] = useState("");
-  const [messagesData, setMessagesData] = useState<Message[]>([]);
   const { userData } = useSelector((store: RootState) => store.user);
+  const { currentConversation: conversationId, conversations } = useSelector(
+    (store: RootState) => store.conversation
+  );
+  const { messagesData } = useSelector((store: RootState) => store.message);
+  const dispatch = useDispatch();
 
   const handleMessageInput = (e: React.ChangeEvent<HTMLInputElement>) => {
     setMessageInput(e.target.value);
   };
 
   const fetchMessages = async () => {
+    const initialMessages =
+      messagesData.length && messagesData[0].conversationId === conversationId
+        ? [...messagesData]
+        : [];
     try {
       const response = await api.get(`/message`, {
         params: {
-          count: messagesData.length,
+          count: initialMessages.length,
           conversationId,
         },
       });
 
       if (response.data) {
-        setMessagesData([...messagesData, ...response.data]);
+        dispatch(setMessagesData([...initialMessages, ...response.data]));
       }
     } catch (error) {}
-  };
-
-  const joinConversation = () => {
-    socket.emit("joinConversation", { conversationId });
-
-    socket.on("message", (data: Message) => {
-      setMessagesData((prevMessages) => [data, ...prevMessages]);
-    });
   };
 
   const sendMessage = async () => {
@@ -83,30 +74,9 @@ const ChatView: React.FC<ChatViewProps> = ({
     if (conversationId) {
       fetchMessages();
     }
-  }, []);
+  }, [conversationId]);
 
-  useEffect(() => {
-    if (conversationId) {
-      const handleConnect = () => {
-        console.log("Socket connected, rejoining conversation...");
-        joinConversation();
-      };
-
-      if (socket.connected) {
-        handleConnect();
-      } else {
-        socket.on("connect", handleConnect);
-      }
-
-      return () => {
-        socket.off("message");
-        socket.off("joinConversation");
-        socket.off("connect", handleConnect);
-      };
-    }
-  }, [conversationId, socket]);
-
-  const findUser = conversationData?.find((item) => item.id === conversationId);
+  const findUser = conversations?.find((item) => item.id === conversationId);
 
   if (!findUser) {
     return (
@@ -141,7 +111,8 @@ const ChatView: React.FC<ChatViewProps> = ({
         </div>
       </div>
       <div className="w-full h-[80vh] overflow-y-scroll scrollbar-none px-2 flex flex-col-reverse gap-1">
-        {messagesData.length > 0 &&
+        {messagesData &&
+          messagesData.length > 0 &&
           messagesData.map((item, index) => {
             const matchUserId = item.senderId === userData?.userId;
 
