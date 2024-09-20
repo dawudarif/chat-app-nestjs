@@ -5,10 +5,10 @@ import ProtectedRoute from "../components/Auth/ProtectedRoute";
 import ChatView from "../components/chat/ChatView/ChatView";
 import ListView from "../components/chat/ListView/ListView";
 import Ring from "../components/Loaders/Ring";
+import { addNewMessage } from "../redux/features/messagesSlice";
 import { RootState } from "../redux/store";
-import { socket } from "../utils/socket";
 import { Message } from "../types/types";
-import { setMessagesData } from "../redux/features/messagesSlice";
+import { socket } from "../utils/socket";
 
 export default function Home() {
   const [loadingScreen, setLoadingScreen] = useState(true);
@@ -22,7 +22,7 @@ export default function Home() {
     socket.emit("joinConversation", { conversationId });
 
     socket.on("message", (data: Message) => {
-      dispatch(setMessagesData(data));
+      dispatch(addNewMessage(data));
     });
   };
 

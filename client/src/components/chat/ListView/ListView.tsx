@@ -64,7 +64,7 @@ const ListView = () => {
   }, [search]);
 
   return (
-    <div className="flex flex-col justify-start items-center w-1/4 p-2 border-r border-brand-black h-[100vh]">
+    <div className="flex flex-col justify-start items-center !w-[25%] p-2 border-r border-brand-black h-[100vh] box-border">
       <Input
         handleChange={handleInputChange}
         value={search}

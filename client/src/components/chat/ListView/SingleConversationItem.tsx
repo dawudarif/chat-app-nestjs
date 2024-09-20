@@ -21,6 +21,8 @@ const SingleConversationItem: React.FC<SingleConversationItemProps> = ({
     dispatch(setCurrentConversation(item.id));
   };
 
+  console.log(item);
+
   return (
     <div
       onClick={handleConversationChange}
@@ -28,9 +30,8 @@ const SingleConversationItem: React.FC<SingleConversationItemProps> = ({
     >
       <div
         className={clsx(
-          item.id === conversationId &&
-            "bg-brand-filled-blue text-white rounded-lg",
-          "group-hover:bg-brand-filled-blue/90 group-hover:text-white text-brand-black group-hover:rounded-lg transition-all duration-100 p-2 my-[.15rem] cursor-pointer"
+          // item.id === conversationId && "bg-brand-filled-blue text-white",
+          "group-hover:bg-brand-filled-blue/90 group-hover:text-white text-brand-black rounded-lg transition-all duration-100 p-2 my-[.15rem] cursor-pointer box-border"
         )}
       >
         <h1 className="font-medium text-base capitalize">
