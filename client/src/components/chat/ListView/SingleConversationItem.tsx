@@ -16,6 +16,7 @@ const SingleConversationItem: React.FC<SingleConversationItemProps> = ({
   latestMessageName,
 }) => {
   const dispatch = useDispatch();
+
   const handleConversationChange = () => {
     dispatch(setCurrentConversation(item.id));
   };

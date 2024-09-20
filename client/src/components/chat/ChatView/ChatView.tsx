@@ -23,18 +23,20 @@ const ChatView = () => {
   };
 
   const fetchMessages = async () => {
+    const initialMessages =
+      messagesData.length && messagesData[0].conversationId === conversationId
+        ? [...messagesData]
+        : [];
     try {
       const response = await api.get(`/message`, {
         params: {
-          count: messagesData.length,
+          count: initialMessages.length,
           conversationId,
         },
       });
 
       if (response.data) {
-        console.log(response.data);
-
-        setMessagesData([...messagesData, ...response.data]);
+        setMessagesData([...initialMessages, ...response.data]);
       }
     } catch (error) {}
   };
@@ -78,7 +80,7 @@ const ChatView = () => {
     if (conversationId) {
       fetchMessages();
     }
-  }, []);
+  }, [conversationId]);
 
   useEffect(() => {
     if (conversationId) {
@@ -142,7 +144,8 @@ const ChatView = () => {
         </div>
       </div>
       <div className="w-full h-[80vh] overflow-y-scroll scrollbar-none px-2 flex flex-col-reverse gap-1">
-        {messagesData.length > 0 &&
+        {messagesData &&
+          messagesData.length > 0 &&
           messagesData.map((item, index) => {
             const matchUserId = item.senderId === userData?.userId;
 
