@@ -1,12 +1,12 @@
+import { UseGuards } from '@nestjs/common';
 import {
   ConnectedSocket,
   MessageBody,
   SubscribeMessage,
   WebSocketGateway,
 } from '@nestjs/websockets';
-import { CookieGuard } from '../auth/cookie.guard';
-import { Req, UseGuards } from '@nestjs/common';
 import { Socket } from 'socket.io';
+import { CookieGuard } from '../auth/cookie.guard';
 
 @WebSocketGateway({
   cors: {
@@ -20,9 +20,17 @@ export class ConversationGateway {
   async joinConversation(
     @MessageBody() data: { conversationId: string },
     @ConnectedSocket() client: Socket,
-    @Req() req: any,
   ) {
     const { conversationId } = data;
     client.join(conversationId);
+  }
+  @UseGuards(CookieGuard)
+  @SubscribeMessage('leaveConversation')
+  async leaveConversation(
+    @MessageBody() data: { conversationId: string },
+    @ConnectedSocket() client: Socket,
+  ) {
+    const { conversationId } = data;
+    client.leave(conversationId);
   }
 }
