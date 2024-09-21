@@ -44,7 +44,7 @@ export class MessageService {
           senderId: message.senderId,
         });
 
-      return message;
+      return { message, updateConversation };
     });
 
     if (!create) {

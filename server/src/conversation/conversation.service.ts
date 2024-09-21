@@ -38,6 +38,26 @@ export class ConversationService {
           },
         },
       },
+      include: {
+        latestMessage: {
+          select: {
+            senderId: true,
+            body: true,
+          },
+        },
+        participants: {
+          include: {
+            user: {
+              select: {
+                username: true,
+                id: true,
+                email: true,
+                name: true,
+              },
+            },
+          },
+        },
+      },
     });
 
     if (!updateConversation) {

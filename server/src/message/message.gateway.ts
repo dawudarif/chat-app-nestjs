@@ -26,12 +26,25 @@ export class MessageGateway {
     @Req() req: any,
     @ConnectedSocket() client: Socket,
   ) {
-    const message = await this.messageService.createMessage({
+    const createNew = await this.messageService.createMessage({
       senderId: req.user.userId,
       conversationId: data.conversationId,
       messageBody: data.message,
     });
 
-    client.broadcast.to(message.conversationId).emit('message', message);
+    const checkUser = createNew.updateConversation.participants.find(
+      (participant) => participant.userId !== req.user.userId,
+    );
+
+    client.broadcast
+      .to(createNew.message.conversationId)
+      .emit('message', createNew.message);
+
+    client.to(checkUser.userId).emit('updateConversation', {
+      ...createNew.updateConversation,
+      participants: createNew.updateConversation.participants.filter(
+        (participant) => participant.userId === req.user.userId,
+      ),
+    });
   }
 }
