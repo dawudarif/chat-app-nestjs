@@ -9,6 +9,7 @@ import { addNewMessage } from "../redux/features/messagesSlice";
 import { RootState } from "../redux/store";
 import { Message } from "../types/types";
 import { socket } from "../utils/socket";
+import { updateConversations } from "../redux/features/conversationSlice";
 
 export default function Home() {
   const [loadingScreen, setLoadingScreen] = useState(true);
@@ -18,34 +19,39 @@ export default function Home() {
   );
   const dispatch = useDispatch();
 
-  const joinConversation = () => {
-    socket.emit("joinConversation", { conversationId });
-
-    socket.on("message", (data: Message) => {
-      dispatch(addNewMessage(data));
-    });
+  const handleIncomingMessage = (data: Message) => {
+    dispatch(addNewMessage(data));
   };
 
-  useEffect(() => {
-    socket.disconnect();
-    socket.connect();
-    socket.on("connect", () => {
-      // console.log("Connected to server");
-    });
+  const joinConversation = () => {
+    socket.emit("joinConversation", { conversationId });
+  };
+
+  const handleSocketConnect = () => {
     if (userData?.userId) {
-      // console.log(`socket joined to ${userData.userId}`);
       socket.emit("join", userData.userId);
+      socket.on("updateConversation", (data) => {
+        dispatch(updateConversations(data));
+      });
     }
+  };
+
+  // socket connection
+  useEffect(() => {
+    socket.connect();
+    socket.on("connect", handleSocketConnect);
 
     return () => {
       socket.disconnect();
     };
   }, [socket, userData?.userId]);
 
+  // message and conversation handler
   useEffect(() => {
     if (conversationId) {
       const handleConnect = () => {
         console.log("Socket connected, rejoining conversation...");
+        socket.on("message", handleIncomingMessage);
         joinConversation();
       };
 
@@ -61,13 +67,13 @@ export default function Home() {
       });
 
       return () => {
-        socket.off("message");
-        socket.off("connect", handleConnect);
-        socket.off("reconnect", handleConnect);
+        socket.off("joinConversation");
+        socket.emit("leaveConversation", { conversationId });
       };
     }
   }, [conversationId, socket]);
 
+  // loading screen
   useEffect(() => {
     const timer = setTimeout(() => {
       setLoadingScreen(false);

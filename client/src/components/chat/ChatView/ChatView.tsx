@@ -2,7 +2,10 @@
 import { ChevronLeft, Send } from "lucide-react";
 import React, { KeyboardEvent, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { setCurrentConversation } from "../../../redux/features/conversationSlice";
+import {
+  setCurrentConversation,
+  updateConversations,
+} from "../../../redux/features/conversationSlice";
 import {
   addNewMessage,
   setMessagesData,
@@ -12,6 +15,7 @@ import api from "../../../utils/api";
 import { socket } from "../../../utils/socket";
 import Input from "../../Custom/Input";
 import SingleMessage from "./SingleMessage";
+import { ConversationData } from "../../../types/types";
 
 const ChatView = () => {
   const [messageInput, setMessageInput] = useState("");
@@ -45,23 +49,42 @@ const ChatView = () => {
     } catch (error) {}
   };
 
+  const handleNewMessageUpdate = () => {
+    if (conversationId && userData?.userId) {
+      const message = {
+        id: `id-${Math.random()}`,
+        conversationId: conversationId,
+        senderId: userData?.userId,
+        body: messageInput,
+        createdAt: `${new Date(Date.now())}`,
+        updatedAt: `${new Date(Date.now())}`,
+      };
+      dispatch(addNewMessage(message));
+
+      const getConversation = conversations.find(
+        (c: ConversationData) => c.id === conversationId
+      );
+
+      if (getConversation) {
+        const conversation = {
+          ...getConversation,
+          latestMessageId: message.id,
+          latestMessage: {
+            body: message.body,
+            senderId: message.senderId,
+          },
+        };
+        dispatch(updateConversations(conversation));
+      }
+    }
+  };
+
   const sendMessage = async () => {
     if (messageInput.trim() === "") {
       return;
     }
     socket.emit("message", { message: messageInput, conversationId });
-    if (conversationId && userData?.userId) {
-      dispatch(
-        addNewMessage({
-          id: `id-${Math.random()}`,
-          conversationId: conversationId,
-          senderId: userData?.userId,
-          body: messageInput,
-          createdAt: `${new Date(Date.now())}`,
-          updatedAt: `${new Date(Date.now())}`,
-        })
-      );
-    }
+    handleNewMessageUpdate();
     setMessageInput("");
   };
 

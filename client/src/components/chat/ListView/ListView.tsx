@@ -48,6 +48,7 @@ const ListView = () => {
       setLoading(false);
     }
   };
+
   useEffect(() => {
     getConversations();
   }, []);
@@ -102,9 +103,9 @@ const ListView = () => {
           conversations?.length > 0 &&
           conversations.map((item: ConversationData) => {
             const latestMessageName =
-              item.latestMessage?.senderId === userData?.userId
+              item?.latestMessage?.senderId === userData?.userId
                 ? "You"
-                : "@" + item.participants[0].user.username?.toLowerCase();
+                : "@" + item?.participants[0]?.user?.username?.toLowerCase();
 
             return (
               <SingleConversationItem
