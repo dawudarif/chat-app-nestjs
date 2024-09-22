@@ -25,17 +25,26 @@ export class ConversationService {
       data: {
         latestMessageId: data.messageId,
         participants: {
-          update: {
-            where: {
-              userId_conversationId: {
+          updateMany: [
+            {
+              where: {
                 userId: data.senderId,
                 conversationId: data.conversationId,
               },
+              data: {
+                hasSeenLatestMessage: true,
+              },
             },
-            data: {
-              hasSeenLatestMessage: true,
+            {
+              where: {
+                userId: { not: data.senderId },
+                conversationId: data.conversationId,
+              },
+              data: {
+                hasSeenLatestMessage: false,
+              },
             },
-          },
+          ],
         },
       },
       include: {
@@ -94,11 +103,6 @@ export class ConversationService {
           },
         },
         participants: {
-          where: {
-            userId: {
-              not: userId,
-            },
-          },
           include: {
             user: {
               select: {
@@ -196,5 +200,30 @@ export class ConversationService {
     }
 
     return { created: true, conversation: createConversation };
+  }
+
+  async markConversationAsRead(conversationId: string, userId: string) {
+    await this.checkConversationWithParticipant(userId, conversationId);
+
+    await this.prisma.conversation.update({
+      where: {
+        id: conversationId,
+      },
+      data: {
+        participants: {
+          update: {
+            where: {
+              userId_conversationId: {
+                userId,
+                conversationId,
+              },
+            },
+            data: {
+              hasSeenLatestMessage: true,
+            },
+          },
+        },
+      },
+    });
   }
 }
