@@ -31,9 +31,34 @@ const conversationSlice = createSlice({
         state.conversations = [...initialConversations, action.payload];
       }
     },
+    markAsRead: (
+      state,
+      action: PayloadAction<{ conversationId: string; userId: string }>
+    ) => {
+      let initialConversations = [...state.conversations];
+
+      const markRead = initialConversations.map((c) => {
+        if (c.id === action.payload.conversationId) {
+          c.participants.forEach((p) => {
+            if (p.userId === action.payload.userId) {
+              return (p.hasSeenLatestMessage = true);
+            }
+            return p;
+          });
+        }
+
+        return c;
+      });
+
+      state.conversations = markRead;
+    },
   },
 });
 
-export const { setCurrentConversation, setConversations, updateConversations } =
-  conversationSlice.actions;
+export const {
+  setCurrentConversation,
+  setConversations,
+  updateConversations,
+  markAsRead,
+} = conversationSlice.actions;
 export default conversationSlice.reducer;

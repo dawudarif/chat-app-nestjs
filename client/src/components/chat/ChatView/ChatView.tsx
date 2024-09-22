@@ -8,6 +8,7 @@ import {
 } from "../../../redux/features/conversationSlice";
 import {
   addNewMessage,
+  clearMessages,
   setMessagesData,
 } from "../../../redux/features/messagesSlice";
 import { RootState } from "../../../redux/store";
@@ -16,9 +17,11 @@ import { socket } from "../../../utils/socket";
 import Input from "../../Custom/Input";
 import SingleMessage from "./SingleMessage";
 import { ConversationData } from "../../../types/types";
+import clsx from "clsx";
 
 const ChatView = () => {
   const [messageInput, setMessageInput] = useState("");
+  const [loading, setLoading] = useState(false);
   const { userData } = useSelector((store: RootState) => store.user);
   const { currentConversation: conversationId, conversations } = useSelector(
     (store: RootState) => store.conversation
@@ -31,11 +34,13 @@ const ChatView = () => {
   };
 
   const fetchMessages = async () => {
-    const initialMessages =
-      messagesData.length && messagesData[0].conversationId === conversationId
-        ? [...messagesData]
-        : [];
     try {
+      setLoading(true);
+      const initialMessages =
+        messagesData.length && messagesData[0].conversationId === conversationId
+          ? [...messagesData]
+          : [];
+
       const response = await api.get(`/message`, {
         params: {
           count: initialMessages.length,
@@ -46,7 +51,10 @@ const ChatView = () => {
       if (response.data) {
         dispatch(setMessagesData([...initialMessages, ...response.data]));
       }
-    } catch (error) {}
+    } catch (error) {
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleNewMessageUpdate = () => {
@@ -96,6 +104,7 @@ const ChatView = () => {
 
   useEffect(() => {
     if (conversationId) {
+      dispatch(clearMessages());
       fetchMessages();
     }
   }, [conversationId]);
@@ -134,7 +143,12 @@ const ChatView = () => {
           </div>
         </div>
       </div>
-      <div className="w-full h-[80vh] overflow-y-scroll scrollbar-none px-2 flex flex-col-reverse gap-1">
+      <div
+        className={clsx(
+          loading && "bg-slate-50 animate-pulse",
+          "w-full h-[80vh] overflow-y-scroll scrollbar-none px-2 flex flex-col-reverse gap-1"
+        )}
+      >
         {messagesData &&
           messagesData.length > 0 &&
           messagesData.map((item, index) => {

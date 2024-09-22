@@ -102,17 +102,11 @@ const ListView = () => {
         : conversations &&
           conversations?.length > 0 &&
           conversations.map((item: ConversationData) => {
-            const latestMessageName =
-              item?.latestMessage?.senderId === userData?.userId
-                ? "You"
-                : "@" + item?.participants[0]?.user?.username?.toLowerCase();
-
             return (
               <SingleConversationItem
                 key={item.id}
                 item={item}
                 conversationId={currentConversation}
-                latestMessageName={latestMessageName}
               />
             );
           })}

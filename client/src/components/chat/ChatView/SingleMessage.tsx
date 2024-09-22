@@ -32,9 +32,11 @@ const SingleMessage: React.FC<SingleMessageProps> = ({
   return (
     <div>
       {(first || display) && (
-        <p className="text-md py-6 text-center font-mono text-brand-black">
-          {getDateFormat(message.createdAt)}
-        </p>
+        <div className="py-6 flex justify-center items-center">
+          <p className="text-md p-1 bg-brand-dark-gray rounded-md text-center font-semibold font-sans text-white w-fit">
+            {getDateFormat(message.createdAt)}
+          </p>
+        </div>
       )}
 
       <div
