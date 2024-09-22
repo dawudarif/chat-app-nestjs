@@ -113,7 +113,12 @@ const ChatView = () => {
 
   if (!findUser) {
     return (
-      <div className="min-h-[100vh] h-full w-full flex justify-center items-center">
+      <div
+        className={clsx(
+          conversationId ? "flex" : "hidden",
+          "min-h-[100vh] h-full w-full md:!flex justify-center items-center"
+        )}
+      >
         <div className="flex justify-center items-center text-base font-medium text-brand-black ">
           Select a Conversation
         </div>
@@ -122,7 +127,12 @@ const ChatView = () => {
   }
 
   return (
-    <div className="min-h-[100vh] h-full w-full">
+    <div
+      className={clsx(
+        conversationId ? "block" : "hidden",
+        "min-h-[100vh] h-full w-full md:!block"
+      )}
+    >
       <div className="flex justify-between items-center p-3 shadow-sm w-full h-full">
         <div className="flex justify-center items-center gap-4">
           <div className="flex justify-center items-center rounded-full h-12 w-12 p-2 bg-brand-black text-white text-h4 uppercase">

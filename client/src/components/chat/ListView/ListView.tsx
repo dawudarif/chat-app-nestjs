@@ -7,6 +7,7 @@ import SingleConversationItem from "./SingleConversationItem";
 import SingleSearchItem from "./SingleSearchItem";
 import { RootState } from "../../../redux/store";
 import { setConversations } from "../../../redux/features/conversationSlice";
+import clsx from "clsx";
 
 const ListView = () => {
   const [search, setSearch] = useState("");
@@ -67,7 +68,12 @@ const ListView = () => {
   }, [search]);
 
   return (
-    <div className="flex flex-col justify-start items-center !w-[25rem] p-2 border-r border-brand-black h-[100vh] box-border">
+    <div
+      className={clsx(
+        !currentConversation ? "flex" : "hidden",
+        "md:flex flex-col justify-start items-center w-full md:w-[18rem] lg:!w-[25rem] p-2 border-r border-brand-black h-[100vh] box-border"
+      )}
+    >
       <Input
         handleChange={handleInputChange}
         value={search}

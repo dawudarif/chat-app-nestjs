@@ -33,7 +33,7 @@ const SingleMessage: React.FC<SingleMessageProps> = ({
     <div>
       {(first || display) && (
         <div className="py-6 flex justify-center items-center">
-          <p className="text-md p-1 bg-brand-dark-gray rounded-md text-center font-semibold font-sans text-white w-fit">
+          <p className="text-md p-1 text-black rounded-md text-center font-semibold font-sans w-fit">
             {getDateFormat(message.createdAt)}
           </p>
         </div>
@@ -47,7 +47,7 @@ const SingleMessage: React.FC<SingleMessageProps> = ({
         <div
           className={clsx(
             sentByMe ? "bg-brand-dark-gray/50" : "bg-brand-filled-blue",
-            "max-h-max min-w-[5rem] max-w-[30rem] flex-col rounded-2xl text-base text-white p-2"
+            "max-h-max min-w-[5rem] max-w-[50%] flex-col rounded-2xl text-base text-white p-2"
           )}
         >
           <p className="text-white">{message.body}</p>
