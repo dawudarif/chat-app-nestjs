@@ -1,4 +1,4 @@
-import { UseGuards } from '@nestjs/common';
+import { Req, UseGuards } from '@nestjs/common';
 import {
   ConnectedSocket,
   MessageBody,
@@ -7,6 +7,7 @@ import {
 } from '@nestjs/websockets';
 import { Socket } from 'socket.io';
 import { CookieGuard } from '../auth/cookie.guard';
+import { ConversationService } from './conversation.service';
 
 @WebSocketGateway({
   cors: {
@@ -15,6 +16,8 @@ import { CookieGuard } from '../auth/cookie.guard';
   },
 })
 export class ConversationGateway {
+  constructor(private conversationService: ConversationService) {}
+
   @UseGuards(CookieGuard)
   @SubscribeMessage('joinConversation')
   async joinConversation(
@@ -24,6 +27,7 @@ export class ConversationGateway {
     const { conversationId } = data;
     client.join(conversationId);
   }
+
   @UseGuards(CookieGuard)
   @SubscribeMessage('leaveConversation')
   async leaveConversation(
@@ -32,5 +36,20 @@ export class ConversationGateway {
   ) {
     const { conversationId } = data;
     client.leave(conversationId);
+  }
+
+  @UseGuards(CookieGuard)
+  @SubscribeMessage('markRead')
+  async markRead(
+    @MessageBody() data: { conversationId: string },
+
+    @Req() req: any,
+  ) {
+    const { conversationId } = data;
+
+    this.conversationService.markConversationAsRead(
+      conversationId,
+      req?.user?.userId,
+    );
   }
 }
