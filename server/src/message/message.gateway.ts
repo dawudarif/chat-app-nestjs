@@ -40,11 +40,8 @@ export class MessageGateway {
       .to(createNew.message.conversationId)
       .emit('message', createNew.message);
 
-    client.to(checkUser.userId).emit('updateConversation', {
-      ...createNew.updateConversation,
-      participants: createNew.updateConversation.participants.filter(
-        (participant) => participant.userId === req.user.userId,
-      ),
-    });
+    client
+      .to(checkUser.userId)
+      .emit('updateConversation', createNew.updateConversation);
   }
 }
