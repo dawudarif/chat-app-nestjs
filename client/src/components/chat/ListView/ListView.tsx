@@ -13,8 +13,6 @@ const ListView = () => {
   const [searchData, setSearchData] = useState<SearchData[]>([]);
   const [searchLoading, setSearchLoading] = useState(false);
   const [loading, setLoading] = useState(false);
-
-  const { userData } = useSelector((store: RootState) => store.user);
   const { currentConversation, conversations } = useSelector(
     (store: RootState) => store.conversation
   );
@@ -49,6 +47,10 @@ const ListView = () => {
     }
   };
 
+  const sortedConversations = [...conversations].sort(
+    (a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
+  );
+
   useEffect(() => {
     getConversations();
   }, []);
@@ -65,7 +67,7 @@ const ListView = () => {
   }, [search]);
 
   return (
-    <div className="flex flex-col justify-start items-center !w-[25%] p-2 border-r border-brand-black h-[100vh] box-border">
+    <div className="flex flex-col justify-start items-center !w-[25rem] p-2 border-r border-brand-black h-[100vh] box-border">
       <Input
         handleChange={handleInputChange}
         value={search}
@@ -99,9 +101,9 @@ const ListView = () => {
           searchData.map((item: SearchData) => {
             return <SingleSearchItem key={item.id} item={item} />;
           })
-        : conversations &&
-          conversations?.length > 0 &&
-          conversations.map((item: ConversationData) => {
+        : sortedConversations &&
+          sortedConversations?.length > 0 &&
+          sortedConversations.map((item: ConversationData) => {
             return (
               <SingleConversationItem
                 key={item.id}

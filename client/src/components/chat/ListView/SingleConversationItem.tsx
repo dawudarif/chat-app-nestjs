@@ -8,6 +8,7 @@ import {
 import { ConversationData } from "../../../types/types";
 import { RootState } from "../../../redux/store";
 import { socket } from "../../../utils/socket";
+import moment from "moment";
 
 interface SingleConversationItemProps {
   item: ConversationData;
@@ -32,6 +33,17 @@ const SingleConversationItem: React.FC<SingleConversationItemProps> = ({
     (p) => p.userId === userData?.userId
   );
 
+  const formatDate = (date?: string) => {
+    const inputDate = moment(date);
+
+    if (inputDate.isSame(moment(), "day")) {
+      return inputDate.format("HH:mm");
+    } else if (inputDate.isSame(moment(), "year")) {
+      return inputDate.format("DD/MM");
+    } else {
+      return inputDate.format("DD/MM/YY");
+    }
+  };
   const latestMessageName =
     item?.latestMessage?.senderId === userData?.userId
       ? "You"
@@ -61,14 +73,24 @@ const SingleConversationItem: React.FC<SingleConversationItemProps> = ({
           "group-hover:bg-brand-filled-blue/90 group-hover:text-white text-brand-black rounded-lg transition-all duration-100 p-2 my-[.15rem] cursor-pointer box-border"
         )}
       >
-        <div className="flex justify-between items-center">
+        <div className="flex justify-between items-start gap-2">
           <h1 className="font-medium text-base capitalize">
             {otherParticipant.user.name}
           </h1>
 
-          {!currentUserParticipant?.hasSeenLatestMessage && (
-            <span className="h-2 w-2 group-hover:bg-transparent bg-brand-filled-blue rounded-full"></span>
-          )}
+          <div className="flex flex-col-reverse items-end justify-center gap-1">
+            <span
+              className={clsx(
+                !currentUserParticipant?.hasSeenLatestMessage
+                  ? "bg-brand-filled-blue"
+                  : "bg-transparent",
+                "h-2 w-2 group-hover:bg-transparent rounded-full"
+              )}
+            ></span>
+            <p className="text-xs">
+              {formatDate(currentUserParticipant?.updatedAt)}
+            </p>
+          </div>
         </div>
 
         {item.latestMessage?.body ? (
