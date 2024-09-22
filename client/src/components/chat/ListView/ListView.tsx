@@ -7,14 +7,13 @@ import SingleConversationItem from "./SingleConversationItem";
 import SingleSearchItem from "./SingleSearchItem";
 import { RootState } from "../../../redux/store";
 import { setConversations } from "../../../redux/features/conversationSlice";
+import clsx from "clsx";
 
 const ListView = () => {
   const [search, setSearch] = useState("");
   const [searchData, setSearchData] = useState<SearchData[]>([]);
   const [searchLoading, setSearchLoading] = useState(false);
   const [loading, setLoading] = useState(false);
-
-  const { userData } = useSelector((store: RootState) => store.user);
   const { currentConversation, conversations } = useSelector(
     (store: RootState) => store.conversation
   );
@@ -49,6 +48,10 @@ const ListView = () => {
     }
   };
 
+  const sortedConversations = [...conversations].sort(
+    (a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
+  );
+
   useEffect(() => {
     getConversations();
   }, []);
@@ -65,7 +68,12 @@ const ListView = () => {
   }, [search]);
 
   return (
-    <div className="flex flex-col justify-start items-center !w-[25%] p-2 border-r border-brand-black h-[100vh] box-border">
+    <div
+      className={clsx(
+        !currentConversation ? "flex" : "hidden",
+        "md:flex flex-col justify-start items-center w-full md:w-[18rem] lg:!w-[25rem] p-2 border-r border-brand-black h-[100vh] box-border"
+      )}
+    >
       <Input
         handleChange={handleInputChange}
         value={search}
@@ -99,20 +107,14 @@ const ListView = () => {
           searchData.map((item: SearchData) => {
             return <SingleSearchItem key={item.id} item={item} />;
           })
-        : conversations &&
-          conversations?.length > 0 &&
-          conversations.map((item: ConversationData) => {
-            const latestMessageName =
-              item?.latestMessage?.senderId === userData?.userId
-                ? "You"
-                : "@" + item?.participants[0]?.user?.username?.toLowerCase();
-
+        : sortedConversations &&
+          sortedConversations?.length > 0 &&
+          sortedConversations.map((item: ConversationData) => {
             return (
               <SingleConversationItem
                 key={item.id}
                 item={item}
                 conversationId={currentConversation}
-                latestMessageName={latestMessageName}
               />
             );
           })}

@@ -8,6 +8,7 @@ import {
 } from "../../../redux/features/conversationSlice";
 import {
   addNewMessage,
+  clearMessages,
   setMessagesData,
 } from "../../../redux/features/messagesSlice";
 import { RootState } from "../../../redux/store";
@@ -16,9 +17,11 @@ import { socket } from "../../../utils/socket";
 import Input from "../../Custom/Input";
 import SingleMessage from "./SingleMessage";
 import { ConversationData } from "../../../types/types";
+import clsx from "clsx";
 
 const ChatView = () => {
   const [messageInput, setMessageInput] = useState("");
+  const [loading, setLoading] = useState(false);
   const { userData } = useSelector((store: RootState) => store.user);
   const { currentConversation: conversationId, conversations } = useSelector(
     (store: RootState) => store.conversation
@@ -31,11 +34,13 @@ const ChatView = () => {
   };
 
   const fetchMessages = async () => {
-    const initialMessages =
-      messagesData.length && messagesData[0].conversationId === conversationId
-        ? [...messagesData]
-        : [];
     try {
+      setLoading(true);
+      const initialMessages =
+        messagesData.length && messagesData[0].conversationId === conversationId
+          ? [...messagesData]
+          : [];
+
       const response = await api.get(`/message`, {
         params: {
           count: initialMessages.length,
@@ -46,7 +51,10 @@ const ChatView = () => {
       if (response.data) {
         dispatch(setMessagesData([...initialMessages, ...response.data]));
       }
-    } catch (error) {}
+    } catch (error) {
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleNewMessageUpdate = () => {
@@ -96,6 +104,7 @@ const ChatView = () => {
 
   useEffect(() => {
     if (conversationId) {
+      dispatch(clearMessages());
       fetchMessages();
     }
   }, [conversationId]);
@@ -104,7 +113,12 @@ const ChatView = () => {
 
   if (!findUser) {
     return (
-      <div className="min-h-[100vh] h-full w-full flex justify-center items-center">
+      <div
+        className={clsx(
+          conversationId ? "flex" : "hidden",
+          "min-h-[100vh] h-full w-full md:!flex justify-center items-center"
+        )}
+      >
         <div className="flex justify-center items-center text-base font-medium text-brand-black ">
           Select a Conversation
         </div>
@@ -113,7 +127,12 @@ const ChatView = () => {
   }
 
   return (
-    <div className="min-h-[100vh] h-full !w-[80%]">
+    <div
+      className={clsx(
+        conversationId ? "block" : "hidden",
+        "min-h-[100vh] h-full w-full md:!block"
+      )}
+    >
       <div className="flex justify-between items-center p-3 shadow-sm w-full h-full">
         <div className="flex justify-center items-center gap-4">
           <div className="flex justify-center items-center rounded-full h-12 w-12 p-2 bg-brand-black text-white text-h4 uppercase">
@@ -134,7 +153,12 @@ const ChatView = () => {
           </div>
         </div>
       </div>
-      <div className="w-full h-[80vh] overflow-y-scroll scrollbar-none px-2 flex flex-col-reverse gap-1">
+      <div
+        className={clsx(
+          loading && "bg-slate-50 animate-pulse",
+          "w-full h-[80vh] overflow-y-scroll scrollbar-none px-2 flex flex-col-reverse gap-1"
+        )}
+      >
         {messagesData &&
           messagesData.length > 0 &&
           messagesData.map((item, index) => {
