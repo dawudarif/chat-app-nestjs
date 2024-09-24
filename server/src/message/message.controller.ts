@@ -1,13 +1,11 @@
 import {
   Controller,
   Get,
-  Param,
   ParseIntPipe,
   Query,
   Req,
   UseGuards,
 } from '@nestjs/common';
-import { AuthGuard } from '@nestjs/passport';
 import { CookieGuard } from '../auth/cookie.guard';
 import { MessageService } from './message.service';
 
