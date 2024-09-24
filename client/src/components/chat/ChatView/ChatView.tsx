@@ -1,6 +1,13 @@
 "use client";
+import clsx from "clsx";
 import { ChevronLeft, Send } from "lucide-react";
-import React, { KeyboardEvent, useEffect, useState } from "react";
+import React, {
+  KeyboardEvent,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
   setCurrentConversation,
@@ -12,16 +19,18 @@ import {
   setMessagesData,
 } from "../../../redux/features/messagesSlice";
 import { RootState } from "../../../redux/store";
+import { ConversationData } from "../../../types/types";
 import api from "../../../utils/api";
 import { socket } from "../../../utils/socket";
 import Input from "../../Custom/Input";
+import Ring from "../../Loaders/Ring";
 import SingleMessage from "./SingleMessage";
-import { ConversationData } from "../../../types/types";
-import clsx from "clsx";
 
 const ChatView = () => {
   const [messageInput, setMessageInput] = useState("");
   const [loading, setLoading] = useState(false);
+  const [oldMessagesLoading, setOldMessagesLoading] = useState(false);
+  const [fetchNew, setFetchNew] = useState(true);
   const { userData } = useSelector((store: RootState) => store.user);
   const { currentConversation: conversationId, conversations } = useSelector(
     (store: RootState) => store.conversation
@@ -29,17 +38,21 @@ const ChatView = () => {
   const { messagesData } = useSelector((store: RootState) => store.message);
   const dispatch = useDispatch();
 
+  const observer = useRef<IntersectionObserver | null>(null);
+
   const handleMessageInput = (e: React.ChangeEvent<HTMLInputElement>) => {
     setMessageInput(e.target.value);
   };
 
   const fetchMessages = async () => {
+    const initialMessages =
+      messagesData.length && messagesData[0].conversationId === conversationId
+        ? [...messagesData]
+        : [];
     try {
-      setLoading(true);
-      const initialMessages =
-        messagesData.length && messagesData[0].conversationId === conversationId
-          ? [...messagesData]
-          : [];
+      initialMessages.length > 0
+        ? setOldMessagesLoading(true)
+        : setLoading(true);
 
       const response = await api.get(`/message`, {
         params: {
@@ -50,10 +63,12 @@ const ChatView = () => {
 
       if (response.data) {
         dispatch(setMessagesData([...initialMessages, ...response.data]));
+        if (response.data.length === 0) setFetchNew(false);
       }
     } catch (error) {
     } finally {
       setLoading(false);
+      setOldMessagesLoading(false);
     }
   };
 
@@ -102,6 +117,22 @@ const ChatView = () => {
     }
   };
 
+  const lastElementRef = useCallback(
+    (node: HTMLElement | null) => {
+      if (!fetchNew && !observer?.current) return;
+      if (observer.current) observer.current.disconnect();
+      observer.current = new IntersectionObserver((entries) => {
+        const firstEntry = entries[0];
+        if (firstEntry.isIntersecting && fetchNew) {
+          fetchMessages();
+        }
+      });
+
+      if (node) observer.current.observe(node);
+    },
+    [messagesData, fetchNew]
+  );
+
   useEffect(() => {
     if (conversationId) {
       dispatch(clearMessages());
@@ -149,7 +180,9 @@ const ChatView = () => {
             className="rounded-md hover:bg-slate-100 p-2 flex justify-center items-center gap-2 cursor-pointer"
           >
             <ChevronLeft color="#272727" size={25} />
-            <p className="text-base text-brand-black font-medium">Back</p>
+            <p className="text-base text-brand-black font-medium md:inline-block hidden">
+              Back
+            </p>
           </div>
         </div>
       </div>
@@ -165,16 +198,25 @@ const ChatView = () => {
             const matchUserId = item.senderId === userData?.userId;
 
             return (
-              <SingleMessage
+              <div
                 key={index}
-                index={index}
-                length={messagesData.length}
-                message={item}
-                messages={messagesData}
-                sentByMe={matchUserId}
-              />
+                ref={index === messagesData.length - 1 ? lastElementRef : null}
+              >
+                <SingleMessage
+                  index={index}
+                  length={messagesData.length}
+                  message={item}
+                  messages={messagesData}
+                  sentByMe={matchUserId}
+                />
+              </div>
             );
           })}
+        {oldMessagesLoading && (
+          <div className="py-4 flex justify-center items-center">
+            <Ring size={25} />
+          </div>
+        )}
       </div>
       <div className="w-full flex justify-start items-center gap-2 mx-1 py-2">
         <Input

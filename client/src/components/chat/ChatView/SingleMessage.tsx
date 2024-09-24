@@ -32,7 +32,7 @@ const SingleMessage: React.FC<SingleMessageProps> = ({
   return (
     <div>
       {(first || display) && (
-        <div className="py-6 flex justify-center items-center">
+        <div className="py-2 md:py-4 flex justify-center items-center">
           <p className="text-md p-1 text-black rounded-md text-center font-semibold font-sans w-fit">
             {getDateFormat(message.createdAt)}
           </p>
@@ -40,7 +40,7 @@ const SingleMessage: React.FC<SingleMessageProps> = ({
       )}
 
       <div
-        className={`box-border flex w-[100%] break-words py-2 ${
+        className={`box-border flex w-[100%] break-words ${
           sentByMe ? "justify-end" : "justify-start"
         }`}
       >
@@ -50,7 +50,7 @@ const SingleMessage: React.FC<SingleMessageProps> = ({
             "max-h-max min-w-[5rem] max-w-[50%] flex-col rounded-2xl text-base text-white p-2"
           )}
         >
-          <p className="text-white">{message.body}</p>
+          <p className="text-white text-sm md:text-base">{message.body}</p>
           <p className="text-right font-mono text-xs">
             {moment(message.createdAt).format("hh:mm a")}
           </p>
