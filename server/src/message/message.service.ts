@@ -71,6 +71,7 @@ export class MessageService {
         createdAt: 'desc',
       },
       skip: count,
+      take: 50,
     });
 
     return messages;
