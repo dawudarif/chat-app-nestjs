@@ -94,7 +94,7 @@ const SingleConversationItem: React.FC<SingleConversationItemProps> = ({
         </div>
 
         {item.latestMessage?.body ? (
-          <h6 className="text-sm italic line-clamp-1 break-words">
+          <h6 className="text-sm line-clamp-1 break-words">
             {latestMessageName}
             {": "} {item.latestMessage?.body}
           </h6>

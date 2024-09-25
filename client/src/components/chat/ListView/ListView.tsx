@@ -85,39 +85,43 @@ const ListView = () => {
         iconColor={search !== "" ? "#0082C8" : undefined}
       />
 
-      {loading || searchLoading
-        ? Array(10)
-            .fill(null)
-            .map((_, i) => {
-              return (
-                <div
-                  key={i}
-                  className="w-full border-b border-brand-dark-gray p-1 group"
-                >
-                  <div className="animate-pulse duration-100 p-2 my-[.15rem] cursor-pointer bg-brand-black/40 rounded-lg">
-                    <h1 className="bg-brand-black/50 rounded-md w-[70%] h-6"></h1>
-                    <h6 className="bg-brand-black/50 rounded-md w-1/2 h-5 mt-1"></h6>
-                  </div>
-                </div>
-              );
-            })
-        : search !== ""
-        ? searchData &&
-          searchData?.length > 0 &&
-          searchData.map((item: SearchData) => {
-            return <SingleSearchItem key={item.id} item={item} />;
-          })
-        : sortedConversations &&
-          sortedConversations?.length > 0 &&
-          sortedConversations.map((item: ConversationData) => {
+      {loading || searchLoading ? (
+        Array(10)
+          .fill(null)
+          .map((_, i) => {
             return (
-              <SingleConversationItem
-                key={item.id}
-                item={item}
-                conversationId={currentConversation}
-              />
+              <div
+                key={i}
+                className="w-full border-b border-brand-dark-gray p-1 group"
+              >
+                <div className="animate-pulse duration-100 p-2 my-[.15rem] cursor-pointer bg-brand-black/40 rounded-lg">
+                  <h1 className="bg-brand-black/50 rounded-md w-[70%] h-6"></h1>
+                  <h6 className="bg-brand-black/50 rounded-md w-1/2 h-5 mt-1"></h6>
+                </div>
+              </div>
             );
-          })}
+          })
+      ) : (
+        <div className="overflow-y-scroll scrollbar-none w-full">
+          {search !== ""
+            ? searchData &&
+              searchData?.length > 0 &&
+              searchData.map((item: SearchData) => {
+                return <SingleSearchItem key={item.id} item={item} />;
+              })
+            : sortedConversations &&
+              sortedConversations?.length > 0 &&
+              sortedConversations.map((item: ConversationData) => {
+                return (
+                  <SingleConversationItem
+                    key={item.id}
+                    item={item}
+                    conversationId={currentConversation}
+                  />
+                );
+              })}
+        </div>
+      )}
     </div>
   );
 };
