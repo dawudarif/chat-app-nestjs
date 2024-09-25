@@ -161,10 +161,10 @@ const ChatView = () => {
     <div
       className={clsx(
         conversationId ? "block" : "hidden",
-        "min-h-[100vh] h-full w-full md:!block"
+        "min-h-[100vh] h-full w-full md:!block relative"
       )}
     >
-      <div className="flex justify-between items-center p-3 shadow-sm w-full h-full">
+      <div className="sticky top-0 left-0 right-0 flex justify-between items-center p-3 shadow-md w-full h-full">
         <div className="flex justify-center items-center gap-4">
           <div className="flex justify-center items-center rounded-full h-12 w-12 p-2 bg-brand-black text-white text-h4 uppercase">
             {findUser?.participants[0].user.name.slice(0, 2)}
@@ -218,7 +218,7 @@ const ChatView = () => {
           </div>
         )}
       </div>
-      <div className="w-full flex justify-start items-center gap-2 mx-1 py-2">
+      <div className="sticky bottom-0 w-full flex justify-start items-center gap-2 mx-1 py-1">
         <Input
           type="text"
           handleChange={handleMessageInput}
@@ -229,7 +229,7 @@ const ChatView = () => {
           otherClasses="w-full max-w-[94%]"
         />
         <div
-          className="hover:bg-brand-filled-blue hover:text-white text-brand-black transition-all duration-300 p-2 flex justify-center items-center rounded-md"
+          className="hover:bg-brand-filled-blue hover:text-white text-brand-black transition-all duration-300 h-full w-12 flex justify-center items-center rounded-md p-2"
           onClick={sendMessage}
         >
           <Send size={30} />
