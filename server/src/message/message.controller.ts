@@ -6,7 +6,7 @@ import {
   Req,
   UseGuards,
 } from '@nestjs/common';
-import { CookieGuard } from '../auth/cookie.guard';
+import { CookieGuard } from '../auth/guard/cookie.guard';
 import { MessageService } from './message.service';
 
 @Controller('message')

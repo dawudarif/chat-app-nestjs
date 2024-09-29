@@ -5,7 +5,7 @@ import { PassportModule } from '@nestjs/passport';
 import { UserModule } from '../user/user.module';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
-import { CookieStrategy } from './auth.strategy';
+import { CookieStrategy } from './strategy/auth.strategy';
 
 @Module({
   imports: [

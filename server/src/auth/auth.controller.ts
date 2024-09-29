@@ -11,7 +11,7 @@ import { Request, Response } from 'express';
 import { CreateUserDTO } from '../user/dto/create-user-dto';
 import { UserService } from '../user/user.service';
 import { AuthService } from './auth.service';
-import { CookieGuard } from './cookie.guard';
+import { CookieGuard } from './guard/cookie.guard';
 import { SigninDTO } from './dto/signIn-dto';
 
 @Controller('auth')
