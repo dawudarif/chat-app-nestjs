@@ -5,7 +5,7 @@ import {
   SubscribeMessage,
   WebSocketGateway,
 } from '@nestjs/websockets';
-import { CookieGuard } from '../auth/cookie.guard';
+import { CookieGuard } from '../auth/guard/cookie.guard';
 import { MessageService } from './message.service';
 import { MessageBodyDTO } from './dto/message-body.dto';
 import { Socket } from 'socket.io';

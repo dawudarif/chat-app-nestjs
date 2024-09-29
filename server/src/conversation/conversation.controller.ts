@@ -1,6 +1,6 @@
 import { Body, Controller, Get, Post, Req, UseGuards } from '@nestjs/common';
 import { Request } from 'express';
-import { CookieGuard } from '../auth/cookie.guard';
+import { CookieGuard } from '../auth/guard/cookie.guard';
 import { CreateConversation } from './dto/create-conversation.dto';
 import { ConversationService } from './conversation.service';
 

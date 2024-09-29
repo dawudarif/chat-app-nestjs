@@ -6,7 +6,7 @@ import {
   WebSocketGateway,
 } from '@nestjs/websockets';
 import { Socket } from 'socket.io';
-import { CookieGuard } from '../auth/cookie.guard';
+import { CookieGuard } from '../auth/guard/cookie.guard';
 import { ConversationService } from './conversation.service';
 
 @WebSocketGateway({
