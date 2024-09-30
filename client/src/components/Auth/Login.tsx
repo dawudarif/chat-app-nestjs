@@ -41,8 +41,8 @@ const Login = () => {
   };
 
   return (
-    <div className="flex justify-center items-center w-full md:px-10 px-5">
-      <div className="flex justify-center items-center flex-col md:mx-0 mx-5 md:max-w-[50%] w-full rounded-xl shadow-lg my-16 md:px-10 px-5 py-10">
+    <div className="flex justify-center items-center w-full md:px-10 px-2 bg-stone-50">
+      <div className="flex justify-center items-center flex-col md:max-w-[50%] w-full rounded-xl shadow-lg my-16 md:px-10 px-5 py-10 bg-white">
         <h1 className="text-h1 text-gray-900 font-semibold">Login</h1>
         <form onSubmit={handleLogin} className="w-full">
           <label htmlFor="email">
