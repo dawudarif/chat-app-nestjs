@@ -22,7 +22,7 @@ export class UserService {
       },
     });
 
-    if (checkEmail) {
+    if (checkEmail?.email) {
       throw new ConflictException('Email already exists');
     }
 
