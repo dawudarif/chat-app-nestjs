@@ -3,7 +3,7 @@ import { UserService } from '../user/user.service';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { PrismaService } from '../prisma/prisma.service';
-import { ConflictException } from '@nestjs/common';
+import { ConflictException, UnauthorizedException } from '@nestjs/common';
 import { Response } from 'express';
 import * as bcrypt from 'bcryptjs';
 import { Test, TestingModule } from '@nestjs/testing';
@@ -180,6 +180,12 @@ describe('AuthService', () => {
           expires: expect.any(Date),
         }),
       );
+    });
+
+    it('should throw an authorizedException in case of incorrect credentials', () => {
+      (userService.getUserWithAllData as jest.Mock).mockResolvedValue(null);
+
+      expect(authService.validateUser).rejects.toThrow(UnauthorizedException);
     });
   });
 });
