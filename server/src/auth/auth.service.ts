@@ -22,11 +22,7 @@ export class AuthService {
     response: Response,
   ): Promise<{ accessToken: string }> {
     try {
-      const findUser = await this.prismaService.user.findUnique({
-        where: {
-          email: user.email,
-        },
-      });
+      const findUser = await this.userService.getUserWithAllData(user.email);
 
       const comparePassword = await bcrypt.compare(
         user.password,
