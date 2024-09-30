@@ -6,6 +6,7 @@ import {
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateUserDTO } from './dto/create-user-dto';
 import * as bcrypt from 'bcryptjs';
+import { User } from '@prisma/client';
 
 @Injectable()
 export class UserService {
@@ -91,5 +92,14 @@ export class UserService {
     });
 
     return users;
+  }
+
+  async getUserWithAllData(email: string): Promise<User | null> {
+    const user = await this.prismaService.user.findUnique({
+      where: {
+        email,
+      },
+    });
+    return user;
   }
 }
