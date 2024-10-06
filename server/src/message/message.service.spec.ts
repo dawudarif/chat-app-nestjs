@@ -5,11 +5,21 @@ import { ConversationService } from '../conversation/conversation.service';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateMessage } from './dto/create-message.dto';
 import { MessageService } from './message.service';
+import { request } from 'express';
 
 describe('MessageService', () => {
   let messageService: MessageService;
   let conversationService: ConversationService;
   let prismaService: PrismaService;
+
+  const mockRequest = () => {
+    const req = {
+      user: {
+        id: '1',
+      },
+    };
+    return req;
+  };
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -20,6 +30,7 @@ describe('MessageService', () => {
           useValue: {
             message: {
               create: jest.fn(),
+              findMany: jest.fn(),
             },
             $transaction: jest.fn(),
           },
@@ -132,6 +143,62 @@ describe('MessageService', () => {
         message,
         updateConversation: conversation,
       });
+    });
+  });
+
+  describe('retreiveMessages', () => {
+    it('retreiveMessages should be defined', () => {
+      expect(messageService.retreiveMessages).toBeDefined();
+    });
+
+    it('should throw UnauthorizedException if user is not a participant', async () => {
+      const conversationId = expect.any(String);
+      const count = expect.any(Number);
+      const req = mockRequest();
+
+      jest
+        .spyOn(conversationService, 'checkConversationWithParticipant')
+        .mockResolvedValue(null);
+
+      await expect(
+        messageService.retreiveMessages(conversationId, count, req),
+      ).rejects.toThrow(UnauthorizedException);
+    });
+
+    it('should retreive messages', async () => {
+      const conversationId = expect.any(String);
+      const count = expect.any(Number);
+      const req = mockRequest();
+
+      const messages: Message[] = [
+        {
+          id: '1',
+          body: 'hello',
+          senderId: '1',
+          conversationId: '1',
+          createdAt: expect.any(Date),
+          updatedAt: expect.any(Date),
+        },
+      ];
+
+      jest
+        .spyOn(conversationService, 'checkConversationWithParticipant')
+        .mockResolvedValue({
+          id: '1',
+          latestMessageId: null,
+          createdAt: expect.any(Date),
+          updatedAt: expect.any(Date),
+        });
+
+      jest.spyOn(prismaService.message, 'findMany').mockResolvedValue(messages);
+
+      const result = await messageService.retreiveMessages(
+        conversationId,
+        count,
+        req,
+      );
+
+      expect(result).toBe(messages);
     });
   });
 });

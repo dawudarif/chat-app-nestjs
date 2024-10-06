@@ -63,6 +63,10 @@ export class MessageService {
         conversationId,
       );
 
+    if (!checkConversation) {
+      throw new UnauthorizedException("You're not a participant");
+    }
+
     const messages = await this.prisma.message.findMany({
       where: {
         conversationId,
